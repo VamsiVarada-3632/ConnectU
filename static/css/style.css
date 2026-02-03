@@ -1,14 +1,44 @@
 /* ============================================
    ConnectU - Secure Social Media Platform
    CSS Stylesheet
-   
-   Color Palette:
-   - Primary: #1a56db (Blue)
-   - Secondary: #111827 (Dark Gray)
-   - Accent: #10b981 (Green for success)
-   - Background: #f9fafb (Light Gray)
-   - White: #ffffff
    ============================================ */
+
+:root {
+    /* Color Palette - Light Mode (Default) */
+    --primary: #1a56db;
+    --primary-hover: #1e40af;
+    --secondary: #111827;
+    --accent: #10b981;
+    --bg-primary: #f9fafb;
+    --bg-card: #ffffff;
+    --text-primary: #111827;
+    --text-secondary: #6b7280;
+    --border-color: #e5e7eb;
+    --border-hover: #9ca3af;
+    --input-bg: #ffffff;
+    --danger: #dc2626;
+    --danger-hover: #b91c1c;
+    --danger-bg: #fef2f2;
+}
+
+[data-theme="dark"] {
+    /* Color Palette - Dark Mode */
+    --primary: #3b82f6;
+    /* Lighter blue for dark mode */
+    --primary-hover: #60a5fa;
+    --secondary: #f9fafb;
+    --accent: #34d399;
+    --bg-primary: #111827;
+    --bg-card: #1f2937;
+    --text-primary: #f9fafb;
+    --text-secondary: #9ca3af;
+    --border-color: #374151;
+    --border-hover: #6b7280;
+    --input-bg: #374151;
+    --danger: #ef4444;
+    --danger-hover: #f87171;
+    --danger-bg: #450a0a;
+}
 
 /* ============================================
    CSS Reset & Base Styles
@@ -29,8 +59,9 @@ body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 16px;
     line-height: 1.5;
-    color: #111827;
-    background-color: #f9fafb;
+    color: var(--text-primary);
+    background-color: var(--bg-primary);
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 a {
@@ -74,7 +105,7 @@ h5,
 h6 {
     font-weight: 600;
     line-height: 1.25;
-    color: #111827;
+    color: var(--text-primary);
 }
 
 h1 {
@@ -110,47 +141,47 @@ h4 {
 }
 
 .btn-primary {
-    background-color: #1a56db;
+    background-color: var(--primary);
     color: #ffffff;
 }
 
 .btn-primary:hover {
-    background-color: #1e40af;
+    background-color: var(--primary-hover);
 }
 
 .btn-outline {
     background-color: transparent;
-    color: #111827;
-    border: 1px solid #d1d5db;
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
 .btn-outline:hover {
-    background-color: #f3f4f6;
-    border-color: #9ca3af;
+    background-color: var(--bg-primary);
+    border-color: var(--border-hover);
 }
 
 .btn-danger {
-    background-color: #dc2626;
+    background-color: var(--danger);
     color: #ffffff;
 }
 
 .btn-danger:hover {
-    background-color: #b91c1c;
+    background-color: var(--danger-hover);
 }
 
 .btn-danger-outline {
     background-color: transparent;
-    color: #dc2626;
-    border: 1px solid #dc2626;
+    color: var(--danger);
+    border: 1px solid var(--danger);
 }
 
 .btn-danger-outline:hover {
-    background-color: #fef2f2;
+    background-color: var(--danger-bg);
 }
 
 .btn-link {
     background: transparent;
-    color: #1a56db;
+    color: var(--primary);
     padding: 0.5rem;
 }
 
@@ -181,7 +212,7 @@ h4 {
     gap: 0.5rem;
     font-weight: 700;
     font-size: 1.25rem;
-    color: #111827;
+    color: var(--text-primary);
 }
 
 .logo-icon {
@@ -190,7 +221,7 @@ h4 {
     justify-content: center;
     width: 36px;
     height: 36px;
-    background-color: #1a56db;
+    background-color: var(--primary);
     color: #ffffff;
     border-radius: 0.5rem;
     font-weight: 700;
@@ -198,7 +229,7 @@ h4 {
 }
 
 .logo-text {
-    color: #111827;
+    color: var(--text-primary);
 }
 
 /* ============================================
@@ -206,7 +237,7 @@ h4 {
    ============================================ */
 .landing-page {
     min-height: 100vh;
-    background-color: #ffffff;
+    background-color: var(--bg-card);
 }
 
 .landing-nav {
@@ -214,9 +245,9 @@ h4 {
     top: 0;
     left: 0;
     right: 0;
-    background-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(var(--bg-card), 0.95);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid var(--border-color);
     z-index: 100;
 }
 
@@ -256,12 +287,12 @@ h4 {
 }
 
 .highlight {
-    color: #1a56db;
+    color: var(--primary);
 }
 
 .hero-subtitle {
     font-size: 1.125rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
     line-height: 1.6;
 }
@@ -283,7 +314,7 @@ h4 {
     align-items: center;
     gap: 0.5rem;
     font-size: 0.875rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .badge-icon {
@@ -299,7 +330,7 @@ h4 {
 
 .visual-card {
     width: 320px;
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 1rem;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
     padding: 1rem;
@@ -315,7 +346,7 @@ h4 {
 .visual-avatar {
     width: 40px;
     height: 40px;
-    background: linear-gradient(135deg, #1a56db, #3b82f6);
+    background: linear-gradient(135deg, var(--primary), #3b82f6);
     border-radius: 50%;
 }
 
@@ -326,7 +357,7 @@ h4 {
 .visual-name {
     height: 12px;
     width: 80px;
-    background: #e5e7eb;
+    background: var(--border-color);
     border-radius: 4px;
     margin-bottom: 4px;
 }
@@ -334,14 +365,14 @@ h4 {
 .visual-time {
     height: 10px;
     width: 60px;
-    background: #f3f4f6;
+    background: var(--bg-primary);
     border-radius: 4px;
 }
 
 .visual-image {
     width: 100%;
     height: 200px;
-    background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+    background: linear-gradient(135deg, var(--bg-primary), var(--border-color));
     border-radius: 0.5rem;
     margin-bottom: 1rem;
 }
@@ -354,7 +385,7 @@ h4 {
 .visual-action {
     height: 24px;
     width: 60px;
-    background: #f3f4f6;
+    background: var(--bg-primary);
     border-radius: 4px;
 }
 
@@ -378,8 +409,8 @@ h4 {
 }
 
 .feature-card {
-    background: #ffffff;
-    border: 1px solid #e5e7eb;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 1rem;
     padding: 2rem;
     transition: all 0.3s ease;
@@ -400,7 +431,7 @@ h4 {
 }
 
 .feature-card p {
-    color: #6b7280;
+    color: var(--text-secondary);
     line-height: 1.6;
 }
 
@@ -449,7 +480,7 @@ h4 {
 
 /* Landing Footer */
 .landing-footer {
-    background: #f9fafb;
+    background: var(--bg-primary);
     padding: 3rem 1.5rem;
     text-align: center;
 }
@@ -467,13 +498,13 @@ h4 {
 }
 
 .footer-text {
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 0.5rem;
 }
 
 .footer-copyright {
     font-size: 0.875rem;
-    color: #9ca3af;
+    color: var(--text-secondary);
 }
 
 /* ============================================
@@ -491,7 +522,9 @@ h4 {
 
 .auth-branding {
     flex: 1;
-    background: linear-gradient(135deg, #1a56db 0%, #111827 100%);
+    flex: 1;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    padding: 3rem;
     padding: 3rem;
     display: flex;
     flex-direction: column;
@@ -568,7 +601,7 @@ h4 {
 
 .step.active .step-number {
     background: #ffffff;
-    color: #1a56db;
+    color: var(--primary);
 }
 
 .step.completed .step-number {
@@ -583,7 +616,9 @@ h4 {
     align-items: center;
     justify-content: center;
     padding: 3rem;
-    background: #ffffff;
+    justify-content: center;
+    padding: 3rem;
+    background: var(--bg-card);
 }
 
 .auth-form-wrapper {
@@ -596,7 +631,7 @@ h4 {
 }
 
 .form-subtitle {
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-bottom: 2rem;
 }
 
@@ -622,18 +657,20 @@ h4 {
 .form-group textarea,
 .form-group select {
     padding: 0.75rem 1rem;
-    border: 1px solid #d1d5db;
+    border: 1px solid var(--border-color);
     border-radius: 0.5rem;
     font-size: 1rem;
     transition: all 0.2s ease;
+    background-color: var(--input-bg);
+    color: var(--text-primary);
 }
 
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #1a56db;
-    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
 }
 
 .form-row {
@@ -644,7 +681,7 @@ h4 {
 
 .input-hint {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .input-hint.success {
@@ -681,7 +718,7 @@ h4 {
 
 .strength-bar {
     height: 4px;
-    background: #e5e7eb;
+    background: var(--border-color);
     border-radius: 2px;
     overflow: hidden;
 }
@@ -706,14 +743,14 @@ h4 {
 
 .strength-text {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     margin-top: 0.25rem;
 }
 
 .password-requirements {
     margin-top: 0.75rem;
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-secondary);
 }
 
 .req-item {
@@ -750,7 +787,7 @@ h4 {
 
 .forgot-link {
     font-size: 0.875rem;
-    color: #1a56db;
+    color: var(--primary);
 }
 
 .forgot-link:hover {
@@ -759,7 +796,7 @@ h4 {
 
 .auth-divider {
     text-align: center;
-    color: #6b7280;
+    color: var(--text-secondary);
     font-size: 0.875rem;
     margin: 1.5rem 0;
 }
@@ -771,7 +808,7 @@ h4 {
 
 .security-reminder {
     font-size: 0.75rem;
-    color: #6b7280;
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -783,7 +820,7 @@ h4 {
 }
 
 .link {
-    color: #1a56db;
+    color: var(--primary);
 }
 
 .link:hover {
@@ -3429,6 +3466,7 @@ h4 {
 .badge-pulse {
     animation: badge-pulse 0.5s ease-in-out;
 }
+
 /* ============================================
    Post Interactions (Likes, Comments, Deletion)
    ============================================ */
@@ -3487,7 +3525,8 @@ h4 {
 }
 
 .action-btn.active .action-icon {
-    content: '\2764'; /* Filled heart */
+    content: '\2764';
+    /* Filled heart */
 }
 
 /* Comments Section */
@@ -3562,6 +3601,11 @@ h4 {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
 }

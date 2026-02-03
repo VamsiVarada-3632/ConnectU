@@ -10,6 +10,49 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        (function () {
+            // Check localStorage
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            }
+        })();
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggle = document.getElementById('theme-toggle');
+            if (toggle) {
+                const icon = toggle.querySelector('.nav-icon');
+                const label = toggle.querySelector('.nav-label');
+                const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+
+                // Set initial state
+                if (isDark) {
+                    icon.textContent = '☀️';
+                    label.textContent = 'Light Mode';
+                }
+
+                toggle.addEventListener('click', function () {
+                    const currentTheme = document.documentElement.getAttribute('data-theme');
+                    const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+                    document.documentElement.setAttribute('data-theme', newTheme);
+                    localStorage.setItem('theme', newTheme);
+
+                    // Update UI
+                    if (newTheme === 'dark') {
+                        icon.textContent = '☀️';
+                        label.textContent = 'Light Mode';
+                    } else {
+                        icon.textContent = '🌙';
+                        label.textContent = 'Dark Mode';
+                    }
+                });
+            }
+        });
+    </script>
     {% block head %}{% endblock %}
 </head>
 
