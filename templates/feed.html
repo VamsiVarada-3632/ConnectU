@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Feed - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="feed-container">
+            {% if current_user.role != 'guest' %}
+            <!-- Create Post Card -->
+            <div class="create-post-card">
+                <div class="create-post-header">
+                    <div class="user-avatar">
+                        {% if current_user.avatar_data %}
+                        <img src="data:image/png;base64,{{ current_user.avatar_data }}" alt="Your avatar">
+                        {% else %}
+                        <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="Your avatar">
+                        {% endif %}
+                    </div>
+                    <a href="{{ url_for('create_post') }}" class="create-post-input">
+                        What's on your mind, {{ current_user.first_name }}?
+                    </a>
+                </div>
+                <div class="create-post-actions">
+                    <a href="{{ url_for('create_post') }}" class="post-action-btn">
+                        <span>&#128247;</span> Photo
+                    </a>
+                    <a href="{{ url_for('create_post') }}" class="post-action-btn">
+                        <span>&#127909;</span> Video
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Posts Feed -->
+            <div class="posts-feed">
+                {% if posts %}
+                {% for post in posts %}
+                <article class="post-card" id="post-{{ post.id }}">
+                    <div class="post-header">
+                        <a href="{{ url_for('profile', username=post.author.username) }}" class="post-author">
+                            <div class="author-avatar">
+                                {% if post.author.avatar_data %}
+                                <img src="data:image/png;base64,{{ post.author.avatar_data }}"
+                                    alt="{{ post.author.username }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="{{ post.author.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="author-info">
+                                <div class="author-name-wrapper">
+                                    <span class="author-name">{{ post.author.first_name }} {{ post.author.last_name
+                                        }}</span>
+                                    {% if post.signature %}
+                                    {% if post.signature_valid %}
+                                    <span class="verified-badge" title="Digital Signature Verified">&#10003;
+                                        Verified</span>
+                                    {% else %}
+                                    <span class="unverified-badge" title="Signature Verification Failed">&#10007;
+                                        Tampered</span>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                                <span class="post-time">{{ get_time_ago(post.created_at) }}</span>
+                            </div>
+                        </a>
+                        {% if post.user_id == current_user.id or current_user.role == 'admin' %}
+                        <div class="post-options-dropdown">
+                            <button class="post-menu-btn" aria-label="Post options"
+                                onclick="togglePostMenu('{{ post.id }}')">
+                                <span>&#8942;</span>
+                            </button>
+                            <div id="post-menu-{{ post.id }}" class="post-dropdown-content">
+                                <button onclick="deletePost('{{ post.id }}')" class="delete-btn">
+                                    <span class="icon">&#128465;</span> Delete Post
+                                </button>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="post-content">
+                        <p>{{ post.content }}</p>
+                    </div>
+                    {% if post.image_data %}
+                    <div class="post-image">
+                        <img src="{{ post.image_data }}" alt="Post image">
+                    </div>
+                    {% endif %}
+                    <div class="post-stats">
+                        <span>{{ post.likes|length if post.likes else 0 }} likes</span>
+                        <span>{{ post.comments|length if post.comments else 0 }} comments</span>
+                    </div>
+                    <div class="post-actions">
+                        <button
+                            class="action-btn {% if current_user.id in post.likes_list.all()|map(attribute='user_id') %}active{% endif %}"
+                            onclick="likePost('{{ post.id }}')" id="like-btn-{{ post.id }}">
+                            <span class="action-icon">&#9825;</span>
+                            <span class="action-label">Like</span>
+                        </button>
+                        <button class="action-btn" onclick="toggleComments('{{ post.id }}')">
+                            <span class="action-icon">&#128172;</span>
+                            <span>Comment</span>
+                        </button>
+                        <button class="action-btn" data-action="share">
+                            <span class="action-icon">&#8594;</span>
+                            <span>Share</span>
+                        </button>
+                    </div>
+
+                    <!-- Comments Section -->
+                    <div class="comments-section" id="comments-{{ post.id }}" style="display: none;">
+                        <div class="comments-list" id="comments-list-{{ post.id }}">
+                            {% for comment in post.comments_list.all() %}
+                            <div class="comment-item">
+                                <strong>{{ comment.user.first_name }} {{ comment.user.last_name }}</strong>
+                                <p>{{ comment.content }}</p>
+                                <span class="comment-time">{{ get_time_ago(comment.created_at) }}</span>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="comment-input-wrapper">
+                            <input type="text" id="comment-input-{{ post.id }}" placeholder="Write a comment..."
+                                onkeypress="if(event.key === 'Enter') submitComment('{{ post.id }}')">
+                            <button onclick="submitComment('{{ post.id }}')">Post</button>
+                        </div>
+                    </div>
+                </article>
+                {% endfor %}
+                {% else %}
+                <div class="empty-feed">
+                    <div class="empty-icon">&#128221;</div>
+                    <h3>No posts to show</h3>
+                    <p>Follow more people to see what they're sharing!</p>
+                    <a href="{{ url_for('search') }}" class="btn btn-primary">Find People</a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </main>
+
+    <!-- Right Sidebar -->
+    <aside class="right-sidebar">
+        <!-- We can dynamically populate this with suggestions if we pass them to the template -->
+        <!-- For now, let's just make it look good but empty or generic links -->
+        <div class="sidebar-section">
+            <h3 class="section-title">Security Status</h3>
+            <div class="security-info-card">
+                <div class="security-item">
+                    <span class="security-icon">&#128274;</span>
+                    <span class="security-label">Account Secure</span>
+                </div>
+                <div class="security-item">
+                    <span class="security-icon">&#128273;</span>
+                    <span class="security-label">RSA Keys Active</span>
+                </div>
+                <div class="security-item">
+                    <span class="security-icon">&#128222;</span>
+                    <span class="security-label">2FA Enabled</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="sidebar-section">
+            <h3 class="section-title">Quick Links</h3>
+            <div class="quick-links">
+                <a href="{{ url_for('friends') }}" class="quick-link">
+                    <span>&#128101;</span> Manage Friends
+                </a>
+                <a href="{{ url_for('settings') }}" class="quick-link">
+                    <span>&#128274;</span> Security Settings
+                </a>
+                <a href="{{ url_for('profile') }}" class="quick-link">
+                    <span>&#128100;</span> Update Profile
+                </a>
+            </div>
+        </div>
+
+        <div class="sidebar-footer-info">
+            <p class="security-badge">
+                <span>&#128274;</span> End-to-end encrypted
+            </p>
+            <p class="copyright">&copy; 2024 ConnectU</p>
+        </div>
+    </aside>
+</div>
+
+<!-- Social JS -->
+<script src="{{ url_for('static', filename='js/social.js') }}"></script>
+{% endblock %}

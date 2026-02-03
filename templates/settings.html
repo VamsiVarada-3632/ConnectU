@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content settings-page">
+        <div class="page-header">
+            <h1>Settings</h1>
+        </div>
+
+        <div class="settings-container">
+            <!-- Settings Navigation -->
+            <nav class="settings-nav">
+                <button class="settings-nav-item active" data-section="account">
+                    <span class="nav-icon">&#128100;</span>
+                    <span>Account</span>
+                </button>
+                <button class="settings-nav-item" data-section="security">
+                    <span class="nav-icon">&#128274;</span>
+                    <span>Security</span>
+                </button>
+                <button class="settings-nav-item" data-section="privacy">
+                    <span class="nav-icon">&#128065;</span>
+                    <span>Privacy</span>
+                </button>
+                <button class="settings-nav-item" data-section="notifications">
+                    <span class="nav-icon">&#128276;</span>
+                    <span>Notifications</span>
+                </button>
+                <button class="settings-nav-item" data-section="data">
+                    <span class="nav-icon">&#128190;</span>
+                    <span>Data & Storage</span>
+                </button>
+            </nav>
+
+            <!-- Settings Content -->
+            <div class="settings-content">
+                <!-- Account Section -->
+                <section class="settings-section active" id="account">
+                    <h2>Account Settings</h2>
+
+                    <div class="settings-card">
+                        <h3>Profile Information</h3>
+                        <div class="settings-item">
+                            <div class="item-info">
+                                <span class="item-label">Name</span>
+                                <span class="item-value">{{ current_user.first_name }} {{ current_user.last_name
+                                    }}</span>
+                            </div>
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-sm btn-outline">Edit</a>
+                        </div>
+                        <div class="settings-item">
+                            <div class="item-info">
+                                <span class="item-label">Username</span>
+                                <span class="item-value">@{{ current_user.username }}</span>
+                            </div>
+                            <a href="{{ url_for('edit_profile') }}" class="btn btn-sm btn-outline">Edit</a>
+                        </div>
+                        <div class="settings-item">
+                            <div class="item-info">
+                                <span class="item-label">Email</span>
+                                <span class="item-value">{{ current_user.email[:3] }}***@***</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline">Change</button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="item-info">
+                                <span class="item-label">Phone</span>
+                                <span class="item-value">********{{ (current_user.phone or '')[-4:] }}</span>
+                            </div>
+                            <button class="btn btn-sm btn-outline">Change</button>
+                        </div>
+                    </div>
+
+                    <div class="settings-card danger-zone">
+                        <h3>Danger Zone</h3>
+                        <div class="settings-item">
+                            <div class="item-info">
+                                <span class="item-label">Deactivate Account</span>
+                                <span class="item-description">Temporarily disable your account</span>
+                            </div>
+                            <button class="btn btn-sm btn-danger-outline">Deactivate</button>
+                        </div>
+                        <div class="settings-item">
+                            <div class="item-info">
+                                <span class="item-label">Delete Account</span>
+                                <span class="item-description">Permanently delete your account and all data</span>
+                            </div>
+                            <button class="btn btn-sm btn-danger">Delete</button>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="settings-section" id="security">
+                    <h2>Security Settings</h2>
+                    <p>Security features (2FA, Sessions) are being integrated with the backend.</p>
+                </section>
+                <section class="settings-section" id="privacy">
+                    <h2>Privacy Settings</h2>
+                    <p>Privacy controls are being linked to your account profile.</p>
+                </section>
+                <section class="settings-section" id="notifications">
+                    <h2>Notification Settings</h2>
+                    <p>Manage how you receive alerts for new activity.</p>
+                </section>
+                <section class="settings-section" id="data">
+                    <h2>Data & Storage</h2>
+                    <p>View storage usage and request your personal data.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script>
+    // Settings navigation
+    const navItems = document.querySelectorAll('.settings-nav-item');
+    const sections = document.querySelectorAll('.settings-section');
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const sectionId = item.dataset.section;
+
+            // Update nav
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+
+            // Update sections
+            sections.forEach(s => s.classList.remove('active'));
+            const targetSection = document.getElementById(sectionId);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+        });
+    });
+</script>
+{% endblock %}

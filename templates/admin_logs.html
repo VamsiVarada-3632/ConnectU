@@ -1,0 +1,183 @@
+{% extends "base.html" %}
+
+{% block title %}System Logs - ConnectU Admin{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    {% include "sidebar_nav.html" %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <div class="header-titles">
+                <a href="{{ url_for('admin_dashboard') }}" class="back-link">&larr; Dashboard</a>
+                <h1>Security Audit Logs</h1>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary">Export CSV</button>
+            </div>
+        </header>
+
+        <section class="admin-panel full-width">
+            <div class="filters-bar">
+                <div class="search-box">
+                    <input type="text" placeholder="Filter by user or event...">
+                </div>
+                <div class="select-box">
+                    <select>
+                        <option value="">All Severities</option>
+                        <option value="info">Info</option>
+                        <option value="warning">Warning</option>
+                        <option value="critical">Critical</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="logs-table-wrapper">
+                <table class="logs-table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User ID</th>
+                            <th>Event Type</th>
+                            <th>Description</th>
+                            <th>Severity</th>
+                            <th>IP Address</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for log in logs %}
+                        <tr class="log-row severity-{{ log.severity }}">
+                            <td class="time-col">{{ log.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                            <td>{{ log.user_id or 'System' }}</td>
+                            <td><span class="event-tag">{{ log.event_type }}</span></td>
+                            <td class="desc-col">{{ log.description }}</td>
+                            <td><span class="severity-badge {{ log.severity }}">{{ log.severity }}</span></td>
+                            <td class="ip-col">{{ log.ip_address or '0.0.0.0' }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<style>
+    .admin-page {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f3f4f6;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        margin-bottom: 2rem;
+    }
+
+    .back-link {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.875rem;
+        display: block;
+        margin-bottom: 0.5rem;
+    }
+
+    .filters-bar {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-box input {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+        min-width: 300px;
+    }
+
+    .select-box select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.375rem;
+    }
+
+    .admin-panel.full-width {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .logs-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .logs-table th {
+        text-align: left;
+        color: #6b7280;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        padding: 1rem;
+        border-bottom: 2px solid #f3f4f6;
+    }
+
+    .logs-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+        vertical-align: top;
+    }
+
+    .time-col {
+        white-space: nowrap;
+        color: #6b7280;
+    }
+
+    .event-tag {
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .desc-col {
+        color: #4b5563;
+        max-width: 400px;
+    }
+
+    .severity-badge {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 1rem;
+        text-transform: uppercase;
+        font-weight: 600;
+    }
+
+    .severity-badge.info {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .severity-badge.warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .severity-badge.critical {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .log-row.severity-critical {
+        background-color: #fffafb;
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,300 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - ConnectU{% endblock %}
+
+{% block content %}
+<div class="admin-page">
+    {% include "sidebar_nav.html" %}
+
+    <main class="main-content">
+        <header class="content-header">
+            <h1>Admin Dashboard</h1>
+            <div class="system-status">
+                <span class="status-indicator online"></span>
+                <span class="status-text">System Online</span>
+            </div>
+        </header>
+
+        <section class="admin-stats">
+            <div class="stat-card">
+                <div class="stat-icon">&#128100;</div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Users</span>
+                    <span class="stat-value">{{ user_count }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">&#128221;</div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Posts</span>
+                    <span class="stat-value">{{ post_count }}</span>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">&#128172;</div>
+                <div class="stat-info">
+                    <span class="stat-label">Total Messages</span>
+                    <span class="stat-value">{{ msg_count }}</span>
+                </div>
+            </div>
+        </section>
+
+        <div class="admin-content-grid">
+            <section class="admin-panel recent-users">
+                <div class="panel-header">
+                    <h2>Recent Users</h2>
+                    <a href="#" class="view-all">View All</a>
+                </div>
+                <div class="users-list">
+                    {% for user in recent_users %}
+                    <div class="user-item">
+                        <div class="user-avatar">
+                            {% if user.avatar_data %}
+                            <img src="{{ user.avatar_data }}" alt="{{ user.username }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                alt="{{ user.username }}">
+                            {% endif %}
+                        </div>
+                        <div class="user-details">
+                            <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                            <span class="user-role badge-{{ user.role }}">{{ user.role|capitalize }}</span>
+                        </div>
+                        <div class="user-actions">
+                            <button class="btn-icon" title="View Profile">&#128065;</button>
+                            <button class="btn-icon delete" title="Suspend User">&#128683;</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="admin-panel security-logs">
+                <div class="panel-header">
+                    <h2>Recent Security Events</h2>
+                    <a href="{{ url_for('admin_logs') }}" class="view-all">View All Logs</a>
+                </div>
+                <div class="logs-table-wrapper">
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>Event</th>
+                                <th>Severity</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for log in recent_logs %}
+                            <tr>
+                                <td>{{ log.event_type }}</td>
+                                <td><span class="severity-badge {{ log.severity }}">{{ log.severity }}</span></td>
+                                <td>{{ get_time_ago(log.created_at) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </div>
+    </main>
+</div>
+
+<style>
+    .admin-page {
+        display: flex;
+        min-height: 100vh;
+        background-color: #f3f4f6;
+    }
+
+    .main-content {
+        flex: 1;
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .content-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .system-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        background: #ffffff;
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .status-indicator {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+    }
+
+    .status-indicator.online {
+        background-color: #10b981;
+    }
+
+    .admin-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: #ffffff;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-icon {
+        font-size: 2rem;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #eff6ff;
+        border-radius: 0.5rem;
+    }
+
+    .stat-info {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .stat-label {
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .admin-content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1.5fr;
+        gap: 1.5rem;
+    }
+
+    .admin-panel {
+        background: #ffffff;
+        border-radius: 0.75rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .view-all {
+        color: #2563eb;
+        font-size: 0.875rem;
+        text-decoration: none;
+    }
+
+    .user-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .user-avatar img {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
+
+    .user-details {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .user-name {
+        font-weight: 500;
+    }
+
+    .user-role {
+        font-size: 0.75rem;
+        display: inline-block;
+        padding: 0.125rem 0.5rem;
+        border-radius: 1rem;
+    }
+
+    .badge-admin {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+
+    .badge-user {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .badge-guest {
+        background: #f3f4f6;
+        color: #374151;
+    }
+
+    .logs-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .logs-table th {
+        text-align: left;
+        color: #6b7280;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        padding-bottom: 0.75rem;
+    }
+
+    .logs-table td {
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+        font-size: 0.875rem;
+    }
+
+    .severity-badge {
+        font-size: 0.75rem;
+        padding: 0.125rem 0.5rem;
+        border-radius: 1rem;
+    }
+
+    .severity-badge.info {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .severity-badge.warning {
+        background: #fef3c7;
+        color: #92400e;
+    }
+
+    .severity-badge.critical {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+</style>
+{% endblock %}

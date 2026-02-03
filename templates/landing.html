@@ -1,0 +1,128 @@
+{% extends 'base.html' %}
+
+{% block title %}ConnectU - Secure Social Platform{% endblock %}
+
+{% block content %}
+<div class="landing-page">
+    <!-- Navigation -->
+    <nav class="landing-nav">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">C</span>
+                <span class="logo-text">ConnectU</span>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('login') }}" class="btn btn-outline">Sign In</a>
+                <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Connect. Share. <span class="highlight">Securely.</span></h1>
+            <p class="hero-subtitle">A trusted social platform designed for students with enterprise-grade security. Your data, your privacy, our priority.</p>
+            <div class="hero-actions">
+                <a href="{{ url_for('register') }}" class="btn btn-primary btn-lg">Create Account</a>
+                <a href="#features" class="btn btn-outline btn-lg">Learn More</a>
+            </div>
+            <div class="trust-badges">
+                <div class="badge">
+                    <span class="badge-icon">&#128274;</span>
+                    <span>End-to-End Encrypted</span>
+                </div>
+                <div class="badge">
+                    <span class="badge-icon">&#9989;</span>
+                    <span>NIST Compliant</span>
+                </div>
+                <div class="badge">
+                    <span class="badge-icon">&#128272;</span>
+                    <span>2FA Protected</span>
+                </div>
+            </div>
+        </div>
+        <div class="hero-visual">
+            <div class="visual-card">
+                <div class="visual-header">
+                    <div class="visual-avatar"></div>
+                    <div class="visual-info">
+                        <div class="visual-name"></div>
+                        <div class="visual-time"></div>
+                    </div>
+                </div>
+                <div class="visual-image"></div>
+                <div class="visual-actions">
+                    <div class="visual-action"></div>
+                    <div class="visual-action"></div>
+                    <div class="visual-action"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <h2 class="section-title">Why Choose ConnectU?</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">&#128100;</div>
+                <h3>Secure Authentication</h3>
+                <p>Multi-factor authentication with OTP verification ensures only you can access your account.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128172;</div>
+                <h3>Private Messaging</h3>
+                <p>End-to-end encrypted conversations using AES-256 encryption keep your chats private.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128247;</div>
+                <h3>Share Moments</h3>
+                <p>Post photos and updates with friends. Digital signatures ensure content authenticity.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128101;</div>
+                <h3>Find Friends</h3>
+                <p>Connect with classmates and make new friends within a secure environment.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128273;</div>
+                <h3>Access Control</h3>
+                <p>Granular privacy settings let you control who sees what. Your data, your rules.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">&#128736;</div>
+                <h3>Data Protection</h3>
+                <p>Passwords hashed with salt, data encrypted at rest. Industry-standard security.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Security Section -->
+    <section class="security-section">
+        <div class="security-content">
+            <h2>Enterprise-Grade Security</h2>
+            <p>Built following NIST SP 800-63-2 E-Authentication Architecture guidelines.</p>
+            <ul class="security-list">
+                <li><strong>Authentication:</strong> Password + OTP (Multi-Factor)</li>
+                <li><strong>Encryption:</strong> AES-256 + RSA Key Exchange</li>
+                <li><strong>Hashing:</strong> SHA-256 with Random Salt</li>
+                <li><strong>Digital Signatures:</strong> RSA-based Integrity Verification</li>
+                <li><strong>Encoding:</strong> Base64 for Secure Data Transfer</li>
+            </ul>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="landing-footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <span class="logo-icon">C</span>
+                <span class="logo-text">ConnectU</span>
+            </div>
+            <p class="footer-text">A secure social platform for students.</p>
+            <p class="footer-copyright">23CSE313 - Foundations of Cyber Security | Lab Evaluation 1</p>
+        </div>
+    </footer>
+</div>
+{% endblock %}

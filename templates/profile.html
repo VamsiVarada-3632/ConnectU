@@ -1,0 +1,229 @@
+{% extends 'base.html' %}
+
+{% block title %}Profile - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content profile-page">
+        <!-- Profile Header -->
+        <div class="profile-header">
+            <div class="profile-cover">
+                <img src="{{ url_for('static', filename='images/default-cover.png') }}" alt="Cover photo">
+            </div>
+            <div class="profile-info-container">
+                <div
+                    class="profile-avatar {% if user.last_seen and (datetime.utcnow() - user.last_seen).total_seconds() < 300 %}online{% endif %}">
+                    {% if user.avatar_data %}
+                    <img src="{{ user.avatar_data }}" alt="{{ user.username }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}" alt="{{ user.username }}">
+                    {% endif %}
+                    <span class="verified-badge" title="Verified Account">&#10003;</span>
+                </div>
+                <div class="profile-details">
+                    <div class="profile-name-section">
+                        <h1 class="profile-name">{{ user.first_name }} {{ user.last_name }}</h1>
+                        <span class="profile-username">@{{ user.username }}</span>
+                    </div>
+                    <p class="profile-bio">{{ user.bio or 'ConnectU Student' }}</p>
+                    <div class="profile-meta">
+                        <span class="meta-item">
+                            <span class="meta-icon">&#128205;</span>
+                            Amrita University
+                        </span>
+                        <span class="meta-item">
+                            <span class="meta-icon">&#128197;</span>
+                            Joined {{ user.created_at.strftime('%B %Y') }}
+                        </span>
+                    </div>
+                </div>
+                <div class="profile-actions">
+                    {% if user.id == current_user.id %}
+                    <a href="{{ url_for('edit_profile') }}" class="btn btn-primary">Edit Profile</a>
+                    {% else %}
+                    {% if friend_status == 'friends' %}
+                    <button class="btn btn-outline" onclick="unfriend('{{ user.id }}')">Unfriend</button>
+                    <a href="{{ url_for('chat', username=user.username) }}" class="btn btn-primary">Message</a>
+                    {% elif friend_status == 'request_sent' %}
+                    <button class="btn btn-outline" disabled>Request Sent</button>
+                    {% elif friend_status == 'request_received' %}
+                    <button class="btn btn-primary"
+                        onclick="acceptFriendRequest('{{ user.id }}', '{{ friendship_id }}')">Accept</button>
+                    <button class="btn btn-outline"
+                        onclick="rejectFriendRequest('{{ user.id }}', '{{ friendship_id }}')">Reject</button>
+                    {% else %}
+                    {% if current_user.role != 'guest' %}
+                    <button class="btn btn-primary" onclick="sendFriendRequest('{{ user.id }}')">Add Friend</button>
+                    {% endif %}
+                    {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Profile Stats -->
+        <div class="profile-stats">
+            <div class="stat-item">
+                <span class="stat-value">{{ posts_count }}</span>
+                <span class="stat-label">Posts</span>
+            </div>
+            <a href="{{ url_for('friends') }}" class="stat-item">
+                <span class="stat-value">{{ friends_count }}</span>
+                <span class="stat-label">Friends</span>
+            </a>
+            <div class="stat-item">
+                <span class="stat-value">---</span>
+                <span class="stat-label">Points</span>
+            </div>
+        </div>
+
+        <!-- Profile Tabs -->
+        <div class="profile-tabs">
+            <button class="tab-btn active" data-tab="posts">Posts</button>
+            <button class="tab-btn" data-tab="photos">Photos</button>
+            <button class="tab-btn" data-tab="about">About</button>
+        </div>
+
+        <!-- Tab Content -->
+        <div class="profile-content">
+            <!-- Posts Tab -->
+            <div class="tab-content active" id="posts">
+                <div class="posts-grid">
+                    {% if posts %}
+                    {% for post in posts %}
+                    <article class="post-card">
+                        <div class="post-header">
+                            <div class="post-author">
+                                <div class="author-avatar">
+                                    {% if user.avatar_data %}
+                                    <img src="{{ user.avatar_data }}" alt="{{ user.username }}">
+                                    {% else %}
+                                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                        alt="{{ user.username }}">
+                                    {% endif %}
+                                </div>
+                                <div class="author-info">
+                                    <div class="author-name-wrapper">
+                                        <span class="author-name">{{ user.first_name }} {{ user.last_name }}</span>
+                                        {% if post.signature %}
+                                        {% if post.signature_valid %}
+                                        <span class="verified-badge" title="Digital Signature Verified">&#10003;
+                                            Verified</span>
+                                        {% else %}
+                                        <span class="unverified-badge" title="Signature Verification Failed">&#10007;
+                                            Tampered</span>
+                                        {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <span class="post-time">{{ get_time_ago(post.created_at) }}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="post-content">
+                            <p>{{ post.content }}</p>
+                        </div>
+                        {% if post.image_data %}
+                        <div class="post-image">
+                            <img src="{{ post.image_data }}" alt="Post image">
+                        </div>
+                        {% endif %}
+                        <div class="post-stats">
+                            <span>{{ post.likes|length if post.likes else 0 }} likes</span>
+                            <span>{{ post.comments|length if post.comments else 0 }} comments</span>
+                        </div>
+                        <div class="post-actions">
+                            <button class="action-btn">
+                                <span class="action-icon">&#9825;</span>
+                                <span>Like</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">&#128172;</span>
+                                <span>Comment</span>
+                            </button>
+                            <button class="action-btn">
+                                <span class="action-icon">&#8594;</span>
+                                <span>Share</span>
+                            </button>
+                        </div>
+                    </article>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No posts yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Photos Tab -->
+            <div class="tab-content" id="photos">
+                <div class="photos-grid">
+                    {% for post in posts %}
+                    {% if post.image_data %}
+                    <div class="photo-item">
+                        <img src="{{ post.image_data }}" alt="Profile photo">
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- About Tab -->
+            <div class="tab-content" id="about">
+                <div class="about-section">
+                    <h3>About {{ user.first_name }}</h3>
+                    <div class="about-item">
+                        <span class="about-icon">&#127891;</span>
+                        <div class="about-info">
+                            <span class="about-label">Education</span>
+                            <span class="about-value">Amrita University</span>
+                        </div>
+                    </div>
+                    <div class="about-item">
+                        <span class="about-icon">&#128205;</span>
+                        <div class="about-info">
+                            <span class="about-label">Location</span>
+                            <span class="about-value">Tamil Nadu</span>
+                        </div>
+                    </div>
+                    <div class="about-item">
+                        <span class="about-icon">&#128188;</span>
+                        <div class="about-info">
+                            <span class="about-label">Interests</span>
+                            <span class="about-value">Cybersecurity, Web Development</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- Social JS -->
+<script src="{{ url_for('static', filename='js/social.js') }}"></script>
+
+<script>
+    // Tab switching functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+
+            // Remove active from all
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            // Add active to clicked
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

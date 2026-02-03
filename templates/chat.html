@@ -1,0 +1,303 @@
+{% extends "base.html" %}
+
+{% block title %}Chat - ConnectU{% endblock %}
+
+{% block content %}
+<div class="chat-page">
+    <!-- Conversations Sidebar -->
+    <aside class="conversations-panel">
+        <div class="conversations-header">
+            <h2>Messages</h2>
+            <button class="new-chat-btn" title="New message">+</button>
+        </div>
+
+        <div class="conversations-search">
+            <span class="search-icon">&#128269;</span>
+            <input type="text" placeholder="Search messages..." class="search-input">
+        </div>
+
+        <div class="conversations-list">
+            {% for conv_user in conversations %}
+            <a href="{{ url_for('chat', username=conv_user.username) }}"
+                class="conversation-item {% if other_user and conv_user.id == other_user.id %}active{% endif %}">
+                <div class="conversation-avatar">
+                    {% if conv_user.avatar_data %}
+                    <img src="{{ conv_user.avatar_data }}" alt="{{ conv_user.username }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                        alt="{{ conv_user.username }}">
+                    {% endif %}
+                </div>
+                <div class="conversation-info">
+                    <div class="conversation-header">
+                        <span class="conversation-name">{{ conv_user.first_name }} {{ conv_user.last_name }}</span>
+                        <span class="conversation-time"></span>
+                    </div>
+                    <div class="conversation-preview">Click to chat</div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </aside>
+
+    <!-- Chat Window -->
+    <main class="chat-window">
+        {% if other_user %}
+        <div class="chat-header">
+            <div class="chat-user-info">
+                <div class="chat-avatar">
+                    {% if other_user.avatar_data %}
+                    <img src="{{ other_user.avatar_data }}" alt="{{ other_user.username }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                        alt="{{ other_user.username }}">
+                    {% endif %}
+                </div>
+                <div class="chat-user-details">
+                    <span class="chat-user-name">{{ other_user.first_name }} {{ other_user.last_name }}</span>
+                    <span class="chat-user-status">Online</span>
+                </div>
+            </div>
+            <div class="chat-actions">
+                <button class="chat-action-btn" title="Voice call">&#128222;</button>
+                <button class="chat-action-btn" title="Video call">&#128247;</button>
+                <button class="chat-action-btn" title="More info">&#128712;</button>
+            </div>
+        </div>
+
+        <!-- Encryption Notice -->
+        <div class="encryption-notice">
+            <span class="encryption-icon">&#128274;</span>
+            <span>Messages are end-to-end encrypted with AES-256. Keys exchanged via RSA.</span>
+        </div>
+
+        <!-- Messages Area -->
+        <div class="messages-area" id="messagesArea">
+            {% if messages %}
+            {% for message in messages %}
+            <div class="message {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}"
+                data-id="{{ message.id }}" id="message-{{ message.id }}">
+                {% if message.sender_id != current_user.id %}
+                <div class="message-avatar">
+                    {% if other_user.avatar_data %}
+                    <img src="{{ other_user.avatar_data }}" alt="{{ other_user.username }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                        alt="{{ other_user.username }}">
+                    {% endif %}
+                </div>
+                {% endif %}
+                <div class="message-content">
+                    {% if message.sender_id == current_user.id %}
+                    <button class="delete-msg-btn" onclick="deleteMessage({{ message.id }})"
+                        title="Unsend Message">&times;</button>
+                    {% endif %}
+                    <p>{{ message.decrypted_body or '[Encrypted Message]' }}</p>
+                    <span class="message-time">{{ message.created_at.strftime('%I:%M %p') }}</span>
+                    {% if message.sender_id == current_user.id %}
+                    <span class="message-status">{% if message.is_read %}&#10003;&#10003;{% else %}&#10003;{% endif
+                        %}</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="empty-chat">
+                <p>No messages yet. Say hi to {{ other_user.first_name }}!</p>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Message Input -->
+        <form class="message-input-form" id="messageForm" action="{{ url_for('send_message') }}" method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="receiver_id" value="{{ other_user.id }}">
+            <button type="button" class="attachment-btn" title="Attach file">&#128206;</button>
+            <input type="text" name="content" class="message-input" placeholder="Type a message..." id="messageInput"
+                required>
+            <button type="button" class="emoji-btn" title="Add emoji">&#128578;</button>
+            <button type="submit" class="send-btn" title="Send message">&#10148;</button>
+        </form>
+        {% else %}
+        <div class="no-chat-selected">
+            <div class="no-chat-icon">&#128172;</div>
+            <h3>Your Messages</h3>
+            <p>Select a friend from the left to start chatting securely.</p>
+        </div>
+        {% endif %}
+    </main>
+
+    <!-- Chat Configuration for JS -->
+    <div id="chat-config" data-current-user-id="{{ current_user.id }}"
+        data-other-username="{{ other_user.username if other_user else '' }}"
+        data-other-avatar-url="{{ other_user.avatar_data if other_user and other_user.avatar_data else '' }}"
+        style="display: none;"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const chatConfig = document.getElementById('chat-config');
+        if (!chatConfig) return;
+
+        const currentUserId = chatConfig.dataset.currentUserId;
+        const otherUsername = chatConfig.dataset.otherUsername;
+        const otherAvatarUrl = chatConfig.dataset.otherAvatarUrl;
+        const messagesArea = document.getElementById('messagesArea');
+        const messageForm = document.getElementById('messageForm');
+        const messageInput = document.getElementById('messageInput');
+        const csrfToken = document.querySelector('input[name="csrf_token"]')?.value || '{{ csrf_token() }}';
+
+        if (messagesArea) {
+            messagesArea.scrollTop = messagesArea.scrollHeight;
+        }
+
+        // Unsend message function
+        window.deleteMessage = async function (messageId) {
+            if (!confirm('Are you sure you want to unsend this message?')) return;
+
+            const msgElement = document.getElementById(`message-${messageId}`);
+            if (msgElement) msgElement.classList.add('deleting');
+
+            try {
+                const response = await fetch(`/api/messages/delete/${messageId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-Token': csrfToken,
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                });
+                const result = await response.json();
+                if (result.success) {
+                    setTimeout(() => msgElement?.remove(), 300);
+                } else {
+                    msgElement?.classList.remove('deleting');
+                    alert('Error deleting message: ' + (result.error || 'Unknown error'));
+                }
+            } catch (error) {
+                msgElement?.classList.remove('deleting');
+                console.error('Error:', error);
+            }
+        };
+
+        async function fetchMessages() {
+            if (!otherUsername) return;
+
+            try {
+                const response = await fetch(`/api/chat/${otherUsername}`);
+                const result = await response.json();
+
+                if (result.success) {
+                    const messages = result.messages;
+                    if (!messagesArea) return;
+
+                    const currentMessages = messagesArea.querySelectorAll('.message[data-id]');
+                    const currentIds = Array.from(currentMessages).map(el => parseInt(el.dataset.id));
+                    const receivedIds = messages.map(m => m.id);
+
+                    // 1. Remove deleted messages (ids in DOM but not in API)
+                    currentIds.forEach(id => {
+                        if (!receivedIds.includes(id)) {
+                            const el = document.getElementById(`message-${id}`);
+                            if (el && !el.classList.contains('deleting')) {
+                                el.classList.add('deleting');
+                                setTimeout(() => el.remove(), 300);
+                            }
+                        }
+                    });
+
+                    // 2. Add new messages
+                    const newMessages = messages.filter(m => !currentIds.includes(m.id));
+
+                    if (newMessages.length > 0) {
+                        newMessages.forEach(msg => {
+                            const isSent = msg.sender_id == currentUserId;
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+                            messageDiv.dataset.id = msg.id;
+                            messageDiv.id = `message-${msg.id}`;
+
+                            let avatarHtml = '';
+                            if (!isSent) {
+                                const avatarSrc = otherAvatarUrl || "{{ url_for('static', filename='images/default-avatar.png') }}";
+                                avatarHtml = `
+                                    <div class="message-avatar">
+                                        <img src="${avatarSrc}" alt="${otherUsername}">
+                                    </div>
+                                `;
+                            }
+
+                            let deleteBtnHtml = isSent ? `<button class="delete-msg-btn" onclick="deleteMessage(${msg.id})" title="Unsend Message">&times;</button>` : '';
+
+                            messageDiv.innerHTML = `
+                                ${avatarHtml}
+                                <div class="message-content">
+                                    ${deleteBtnHtml}
+                                    <p>${msg.content}</p>
+                                    <span class="message-time">${msg.created_at}</span>
+                                    ${isSent ? `<span class="message-status">${msg.is_read ? '&#10003;&#10003;' : '&#10003;'}</span>` : ''}
+                                </div>
+                            `;
+                            messagesArea.appendChild(messageDiv);
+                        });
+
+                        messagesArea.scrollTop = messagesArea.scrollHeight;
+                    }
+
+                    // Toggle empty chat text
+                    const emptyChat = messagesArea.querySelector('.empty-chat');
+                    if (messages.length > 0 && emptyChat) {
+                        emptyChat.remove();
+                    } else if (messages.length === 0 && !emptyChat) {
+                        messagesArea.innerHTML = `<div class="empty-chat"><p>No messages yet. Say hi to ${otherUsername}!</p></div>`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching messages:', error);
+            }
+        }
+
+        // Poll every 3 seconds
+        if (otherUsername) {
+            setInterval(fetchMessages, 3000);
+        }
+
+        if (messageForm) {
+            const sendBtn = messageForm.querySelector('.send-btn');
+
+            messageForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+
+                const content = messageInput.value.trim();
+                if (!content) return;
+
+                if (sendBtn) sendBtn.disabled = true;
+
+                try {
+                    const formData = new FormData(messageForm);
+                    const response = await fetch(messageForm.action, {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-Requested-With': 'XMLHttpRequest',
+                            'X-CSRF-Token': csrfToken
+                        }
+                    });
+
+                    const result = await response.json();
+
+                    if (result.success) {
+                        messageInput.value = '';
+                        fetchMessages();
+                    } else {
+                        alert('Error sending message: ' + (result.error || 'Unknown error'));
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                } finally {
+                    if (sendBtn) sendBtn.disabled = false;
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

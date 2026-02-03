@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}Verify OTP - ConnectU{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Left Panel - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <a href="{{ url_for('landing') }}" class="logo">
+                    <span class="logo-icon">C</span>
+                    <span class="logo-text">ConnectU</span>
+                </a>
+                <h1>Verify Your Identity</h1>
+                <p>Multi-factor authentication keeps your account secure.</p>
+                
+                <div class="registration-steps">
+                    <div class="step completed">
+                        <span class="step-number">&#10003;</span>
+                        <span class="step-label">Create Account</span>
+                    </div>
+                    <div class="step active">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Verify OTP</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Setup Profile</span>
+                    </div>
+                </div>
+
+                <div class="security-note">
+                    <span class="security-icon">&#128272;</span>
+                    <span>OTP expires in 5 minutes for your security</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - OTP Form -->
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <div class="otp-icon">&#128231;</div>
+                <h2>Check Your Email</h2>
+                <p class="form-subtitle">
+                    We've sent a 6-digit verification code to<br>
+                    <strong id="maskedEmail">j***@university.edu</strong>
+                </p>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('verify_otp') }}" method="POST" class="auth-form" id="otpForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+
+                    <div class="otp-input-container">
+                        <input type="text" class="otp-input" maxlength="1" data-index="0" autofocus>
+                        <input type="text" class="otp-input" maxlength="1" data-index="1">
+                        <input type="text" class="otp-input" maxlength="1" data-index="2">
+                        <input type="text" class="otp-input" maxlength="1" data-index="3">
+                        <input type="text" class="otp-input" maxlength="1" data-index="4">
+                        <input type="text" class="otp-input" maxlength="1" data-index="5">
+                    </div>
+                    <input type="hidden" name="otp" id="otpValue">
+
+                    <div class="otp-timer">
+                        <span id="timerText">Code expires in <strong id="countdown">05:00</strong></span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block" id="verifyBtn">
+                        Verify Code
+                    </button>
+                </form>
+
+                <div class="otp-actions">
+                    <p>Didn't receive the code?</p>
+                    <button type="button" class="btn btn-link" id="resendBtn" onclick="resendOTP()">
+                        Resend Code
+                    </button>
+                </div>
+
+                <div class="auth-divider">
+                    <span>or</span>
+                </div>
+
+                <a href="{{ url_for('register') }}" class="btn btn-outline btn-block">
+                    Use Different Email
+                </a>
+
+                <div class="auth-footer">
+                    <p class="security-reminder">
+                        <span class="security-icon-small">&#128161;</span>
+                        Never share your OTP with anyone. ConnectU will never ask for it.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// OTP Input Handling
+const otpInputs = document.querySelectorAll('.otp-input');
+const otpValue = document.getElementById('otpValue');
+
+otpInputs.forEach((input, index) => {
+    input.addEventListener('input', (e) => {
+        const value = e.target.value;
+        
+        // Allow only numbers
+        if (!/^\d*$/.test(value)) {
+            e.target.value = '';
+            return;
+        }
+        
+        // Move to next input
+        if (value && index < otpInputs.length - 1) {
+            otpInputs[index + 1].focus();
+        }
+        
+        // Update hidden input
+        updateOTPValue();
+    });
+    
+    input.addEventListener('keydown', (e) => {
+        // Handle backspace
+        if (e.key === 'Backspace' && !e.target.value && index > 0) {
+            otpInputs[index - 1].focus();
+        }
+    });
+    
+    input.addEventListener('paste', (e) => {
+        e.preventDefault();
+        const pastedData = e.clipboardData.getData('text').slice(0, 6);
+        if (/^\d+$/.test(pastedData)) {
+            pastedData.split('').forEach((char, i) => {
+                if (otpInputs[i]) {
+                    otpInputs[i].value = char;
+                }
+            });
+            updateOTPValue();
+            otpInputs[Math.min(pastedData.length, otpInputs.length - 1)].focus();
+        }
+    });
+});
+
+function updateOTPValue() {
+    let otp = '';
+    otpInputs.forEach(input => {
+        otp += input.value;
+    });
+    otpValue.value = otp;
+}
+
+// Countdown Timer
+let timeLeft = 300; // 5 minutes in seconds
+const countdownEl = document.getElementById('countdown');
+const timerText = document.getElementById('timerText');
+const resendBtn = document.getElementById('resendBtn');
+
+function updateTimer() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+    
+    if (timeLeft === 0) {
+        timerText.innerHTML = '<span class="expired">Code has expired</span>';
+        resendBtn.disabled = false;
+        resendBtn.classList.add('active');
+    } else {
+        timeLeft--;
+        setTimeout(updateTimer, 1000);
+    }
+}
+
+updateTimer();
+
+function resendOTP() {
+    // Backend will handle actual resend
+    alert('A new OTP has been sent to your email.');
+    timeLeft = 300;
+    resendBtn.disabled = true;
+    resendBtn.classList.remove('active');
+    timerText.innerHTML = 'Code expires in <strong id="countdown">05:00</strong>';
+    updateTimer();
+    
+    // Clear inputs
+    otpInputs.forEach(input => input.value = '');
+    otpInputs[0].focus();
+}
+</script>
+{% endblock %}

@@ -1,0 +1,159 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Post - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content create-post-page">
+        <div class="page-header">
+            <h1>Create Post</h1>
+        </div>
+
+        <form action="{{ url_for('create_post') }}" method="POST" enctype="multipart/form-data"
+            class="create-post-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Post Author -->
+            <div class="post-author-section">
+                <div class="author-avatar">
+                    {% if current_user.avatar_data %}
+                    <img src="data:image/png;base64,{{ current_user.avatar_data }}" alt="{{ current_user.username }}">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                        alt="{{ current_user.username }}">
+                    {% endif %}
+                </div>
+                <div class="author-info">
+                    <span class="author-name">{{ current_user.first_name }} {{ current_user.last_name }}</span>
+                    <div class="post-visibility">
+                        <select name="visibility" id="visibility">
+                            <option value="public">&#127758; Public</option>
+                            <option value="friends">&#128101; Friends Only</option>
+                            <option value="private">&#128274; Only Me</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Post Content -->
+            <div class="post-content-section">
+                <textarea name="content" id="postContent"
+                    placeholder="What's on your mind, {{ current_user.first_name }}?" rows="5"
+                    maxlength="2000"></textarea>
+                <span class="char-count"><span id="contentCount">0</span>/2000</span>
+            </div>
+
+            <!-- Media Upload -->
+            <div class="media-upload-section">
+                <div class="media-preview" id="mediaPreview" style="display: none;">
+                    <button type="button" class="remove-media" onclick="removeMedia()">&#10005;</button>
+                    <img id="imagePreview" alt="Post image preview">
+                </div>
+
+                <div class="upload-options">
+                    <label class="upload-option" for="imageUpload">
+                        <span class="option-icon">&#128247;</span>
+                        <span>Photo (Up to 20MB)</span>
+                        <input type="file" id="imageUpload" name="image" accept="image/*" hidden>
+                    </label>
+                    <label class="upload-option" for="videoUpload">
+                        <span class="option-icon">&#127909;</span>
+                        <span>Video</span>
+                        <input type="file" id="videoUpload" name="video" accept="video/*" hidden>
+                    </label>
+                    <button type="button" class="upload-option" onclick="toggleTagging()">
+                        <span class="option-icon">&#128100;</span>
+                        <span>Tag Friends</span>
+                    </button>
+                    <button type="button" class="upload-option" onclick="toggleLocation()">
+                        <span class="option-icon">&#128205;</span>
+                        <span>Location</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tag Friends (hidden by default) -->
+            <div class="tag-friends-section" id="tagFriends" style="display: none;">
+                <label>Tag Friends</label>
+                <input type="text" name="tagged_friends" placeholder="Search for friends to tag...">
+                <div class="tagged-list" id="taggedList"></div>
+            </div>
+
+            <!-- Location (hidden by default) -->
+            <div class="location-section" id="locationSection" style="display: none;">
+                <label>Add Location</label>
+                <input type="text" name="location" placeholder="Where are you?">
+            </div>
+
+            <!-- Security Info -->
+            <div class="security-info">
+                <div class="security-badge">
+                    <span class="badge-icon">&#128274;</span>
+                    <span class="badge-text">Your post will be digitally signed for authenticity verification</span>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{{ url_for('feed') }}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary" id="postBtn" disabled>Post</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script>
+    // Content character count and post button enable
+    const postContent = document.getElementById('postContent');
+    const contentCount = document.getElementById('contentCount');
+    const postBtn = document.getElementById('postBtn');
+
+    postContent.addEventListener('input', function () {
+        contentCount.textContent = this.value.length;
+        updatePostButton();
+    });
+
+    // Image upload preview
+    document.getElementById('imageUpload').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('imagePreview').src = e.target.result;
+                document.getElementById('mediaPreview').style.display = 'block';
+                updatePostButton();
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    function removeMedia() {
+        document.getElementById('mediaPreview').style.display = 'none';
+        document.getElementById('imageUpload').value = '';
+        document.getElementById('videoUpload').value = '';
+        updatePostButton();
+    }
+
+    function updatePostButton() {
+        const hasContent = postContent.value.trim().length > 0;
+        const hasMedia = document.getElementById('imageUpload').files.length > 0 ||
+            document.getElementById('videoUpload').files.length > 0;
+        postBtn.disabled = !(hasContent || hasMedia);
+    }
+
+    function toggleTagging() {
+        const tagSection = document.getElementById('tagFriends');
+        tagSection.style.display = tagSection.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function toggleLocation() {
+        const locationSection = document.getElementById('locationSection');
+        locationSection.style.display = locationSection.style.display === 'none' ? 'block' : 'none';
+    }
+</script>
+{% endblock %}

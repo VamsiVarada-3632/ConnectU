@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() if csrf_token is defined else '' }}">
+    <title>{% block title %}ConnectU{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    {% block head %}{% endblock %}
+</head>
+
+<body>
+    {% block content %}{% endblock %}
+
+    {% if current_user.is_authenticated and current_user.role == 'guest' %}
+    {% include "guest_modal.html" %}
+    <script>
+        document.addEventListener('click', function (e) {
+            // Target like/comment buttons and other restricted elements
+            const restrictedSelectors = [
+                '.action-btn[data-action="like"]',
+                '.action-btn[data-action="comment"]',
+                '.btn-primary[onclick*="sendFriendRequest"]',
+                '.post-action-btn'
+            ];
+
+            const isRestrictedTarget = restrictedSelectors.some(selector => e.target.closest(selector));
+
+            if (isRestrictedTarget) {
+                e.preventDefault();
+                e.stopPropagation();
+                openGuestModal();
+            }
+        }, true); // Use capture phase to intercept before other listeners
+    </script>
+    {% endif %}
+
+    <!-- Dynamic Updates Script -->
+    <script src="{{ url_for('static', filename='js/dynamic_updates.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+
+
+</html>

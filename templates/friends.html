@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Friends - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content friends-page">
+        <div class="page-header">
+            <h1>Friends</h1>
+            <div class="search-box">
+                <span class="search-icon">&#128269;</span>
+                <input type="text" placeholder="Search friends..." class="search-input">
+            </div>
+        </div>
+
+        <!-- Friends Tabs -->
+        <div class="friends-tabs">
+            <button class="tab-btn active" data-tab="all-friends">
+                All Friends
+                <span class="tab-count" id="count-friends">{{ friends|length }}</span>
+            </button>
+            <button class="tab-btn" data-tab="requests">
+                Friend Requests
+                <span class="tab-count badge" id="count-friend-requests">{{ pending_requests|length }}</span>
+            </button>
+            <button class="tab-btn" data-tab="sent">
+                Sent Requests
+                <span class="tab-count" id="count-sent-requests">{{ sent_requests|length }}</span>
+            </button>
+
+            <button class="tab-btn" data-tab="suggestions">
+                Suggestions
+            </button>
+        </div>
+
+        <!-- Tabs Content -->
+        <div class="friends-content">
+            <!-- All Friends Tab -->
+            <div class="tab-content active" id="all-friends">
+                <div class="friends-list">
+                    {% if friends %}
+                    {% for friend in friends %}
+                    <div class="friend-list-card" id="friend-card-{{ friend.id }}">
+                        <a href="{{ url_for('profile', username=friend.username) }}" class="friend-info">
+                            <div
+                                class="friend-avatar {% if friend.last_seen and (datetime.utcnow() - friend.last_seen).total_seconds() < 300 %}online{% endif %}">
+                                {% if friend.avatar_data %}
+                                <img src="{{ friend.avatar_data }}" alt="{{ friend.username }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="{{ friend.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="friend-details">
+                                <span class="friend-name">{{ friend.first_name }} {{ friend.last_name }}</span>
+                                <span class="friend-username">@{{ friend.username }}</span>
+                            </div>
+                        </a>
+                        <div class="friend-actions">
+                            <a href="{{ url_for('chat', username=friend.username) }}"
+                                class="btn btn-sm btn-outline">Message</a>
+                            <button class="btn btn-sm btn-danger-outline"
+                                onclick="unfriend('{{ friend.id }}')">Unfriend</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>You haven't added any friends yet.</p>
+                        <button class="btn btn-primary btn-sm"
+                            onclick="document.querySelector('[data-tab=suggestions]').click()">Find Friends</button>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Friend Requests Tab -->
+            <div class="tab-content" id="requests">
+                <div class="requests-list">
+                    {% if pending_requests %}
+                    {% for request in pending_requests %}
+                    <div class="request-card" id="request-{{ request.id }}">
+                        <a href="{{ url_for('profile', username=request.requester.username) }}" class="friend-info">
+                            <div class="friend-avatar">
+                                {% if request.requester.avatar_data %}
+                                <img src="{{ request.requester.avatar_data }}" alt="{{ request.requester.username }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="{{ request.requester.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="friend-details">
+                                <span class="friend-name">{{ request.requester.first_name }} {{
+                                    request.requester.last_name }}</span>
+                                <span class="friend-username">@{{ request.requester.username }}</span>
+                                <span class="mutual-count">{{ get_time_ago(request.created_at) }}</span>
+                            </div>
+                        </a>
+                        <div class="request-actions">
+                            <button class="btn btn-primary btn-sm"
+                                onclick="acceptFriendRequest('{{ request.user_id }}', '{{ request.id }}')">Accept</button>
+                            <button class="btn btn-outline btn-sm"
+                                onclick="rejectFriendRequest('{{ request.user_id }}', '{{ request.id }}')">Decline</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No pending friend requests.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Sent Requests Tab -->
+            <div class="tab-content" id="sent">
+                <div class="requests-list">
+                    {% if sent_requests %}
+                    {% for request in sent_requests %}
+                    <div class="request-card" id="sent-request-{{ request.id }}">
+                        <a href="{{ url_for('profile', username=request.receiver.username) }}" class="friend-info">
+                            <div class="friend-avatar">
+                                {% if request.receiver.avatar_data %}
+                                <img src="{{ request.receiver.avatar_data }}" alt="{{ request.receiver.username }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="{{ request.receiver.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="friend-details">
+                                <span class="friend-name">{{ request.receiver.first_name }} {{
+                                    request.receiver.last_name }}</span>
+                                <span class="friend-username">@{{ request.receiver.username }}</span>
+                                <span class="request-status">Sent {{ get_time_ago(request.created_at) }}</span>
+                            </div>
+                        </a>
+                        <div class="request-actions">
+                            <button class="btn btn-outline btn-sm"
+                                onclick="cancelFriendRequest('{{ request.id }}')">Cancel Request</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>You haven't sent any friend requests.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Suggestions Tab -->
+            <div class="tab-content" id="suggestions">
+                <div class="suggestions-list">
+                    {% if suggestions %}
+                    {% for suggestion in suggestions %}
+                    <div class="suggestion-card" id="suggestion-{{ suggestion.id }}">
+                        <a href="{{ url_for('profile', username=suggestion.username) }}" class="friend-info">
+                            <div class="friend-avatar">
+                                {% if suggestion.avatar_data %}
+                                <img src="{{ suggestion.avatar_data }}" alt="{{ suggestion.username }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="{{ suggestion.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="friend-details">
+                                <span class="friend-name">{{ suggestion.first_name }} {{ suggestion.last_name }}</span>
+                                <span class="friend-username">@{{ suggestion.username }}</span>
+                            </div>
+                        </a>
+                        <div class="suggestion-actions">
+                            <button class="btn btn-primary btn-sm"
+                                onclick="sendFriendRequest('{{ suggestion.id }}')">Add Friend</button>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <div class="empty-state">
+                        <p>No suggestions available at the moment.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </main>
+</div>
+
+<!-- Social JS -->
+<script src="{{ url_for('static', filename='js/social.js') }}"></script>
+
+<script>
+
+    // Tab switching functionality
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+
+            // Remove active from all
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+
+            // Add active to clicked
+            btn.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+</script>
+{% endblock %}

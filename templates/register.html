@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Account - ConnectU{% endblock %}
+
+{% block content %}
+<div class="auth-page">
+    <div class="auth-container">
+        <!-- Left Panel - Branding -->
+        <div class="auth-branding">
+            <div class="branding-content">
+                <a href="{{ url_for('landing') }}" class="logo">
+                    <span class="logo-icon">C</span>
+                    <span class="logo-text">ConnectU</span>
+                </a>
+                <h1>Join ConnectU</h1>
+                <p>Create your secure account and connect with friends.</p>
+                
+                <div class="registration-steps">
+                    <div class="step active">
+                        <span class="step-number">1</span>
+                        <span class="step-label">Create Account</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">2</span>
+                        <span class="step-label">Verify OTP</span>
+                    </div>
+                    <div class="step">
+                        <span class="step-number">3</span>
+                        <span class="step-label">Setup Profile</span>
+                    </div>
+                </div>
+
+                <div class="security-note">
+                    <span class="security-icon">&#128736;</span>
+                    <span>Your password will be hashed with SHA-256 + Salt</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Registration Form -->
+        <div class="auth-form-container">
+            <div class="auth-form-wrapper">
+                <h2>Create Account</h2>
+                <p class="form-subtitle">Fill in your details to get started</p>
+
+                <!-- Flash Messages -->
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">{{ message }}</div>
+                        {% endfor %}
+                    {% endif %}
+                {% endwith %}
+
+                <form action="{{ url_for('register') }}" method="POST" class="auth-form" id="registerForm">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() if csrf_token is defined else '' }}">
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="first_name">First Name</label>
+                            <input 
+                                type="text" 
+                                id="first_name" 
+                                name="first_name" 
+                                placeholder="John"
+                                required
+                                autocomplete="given-name"
+                                pattern="[A-Za-z]+"
+                            >
+                        </div>
+                        <div class="form-group">
+                            <label for="last_name">Last Name</label>
+                            <input 
+                                type="text" 
+                                id="last_name" 
+                                name="last_name" 
+                                placeholder="Doe"
+                                required
+                                autocomplete="family-name"
+                                pattern="[A-Za-z]+"
+                            >
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="username">Username</label>
+                        <input 
+                            type="text" 
+                            id="username" 
+                            name="username" 
+                            placeholder="johndoe"
+                            required
+                            autocomplete="username"
+                            pattern="[a-z0-9_]+"
+                            minlength="3"
+                            maxlength="20"
+                        >
+                        <span class="input-hint">3-20 characters, lowercase letters, numbers, and underscores only</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">Email Address</label>
+                        <input 
+                            type="email" 
+                            id="email" 
+                            name="email" 
+                            placeholder="you@university.edu"
+                            required
+                            autocomplete="email"
+                        >
+                        <span class="input-hint">We'll send a verification OTP to this email</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">Phone Number (Optional)</label>
+                        <input 
+                            type="tel" 
+                            id="phone" 
+                            name="phone" 
+                            placeholder="+91 9876543210"
+                            autocomplete="tel"
+                            pattern="[+]?[0-9\s-]+"
+                        >
+                        <span class="input-hint">For additional account recovery options</span>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                placeholder="Create a strong password"
+                                required
+                                autocomplete="new-password"
+                                minlength="8"
+                                onkeyup="checkPasswordStrength()"
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePassword('password')">
+                                <span id="password-toggle-icon">&#128065;</span>
+                            </button>
+                        </div>
+                        <div class="password-strength">
+                            <div class="strength-bar">
+                                <div class="strength-fill" id="strengthFill"></div>
+                            </div>
+                            <span class="strength-text" id="strengthText">Enter a password</span>
+                        </div>
+                        <ul class="password-requirements">
+                            <li id="req-length" class="req-item">At least 8 characters</li>
+                            <li id="req-upper" class="req-item">One uppercase letter</li>
+                            <li id="req-lower" class="req-item">One lowercase letter</li>
+                            <li id="req-number" class="req-item">One number</li>
+                            <li id="req-special" class="req-item">One special character (!@#$%^&*)</li>
+                        </ul>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="confirm_password">Confirm Password</label>
+                        <div class="password-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="confirm_password" 
+                                name="confirm_password" 
+                                placeholder="Confirm your password"
+                                required
+                                autocomplete="new-password"
+                                onkeyup="checkPasswordMatch()"
+                            >
+                            <button type="button" class="toggle-password" onclick="togglePassword('confirm_password')">
+                                <span id="confirm_password-toggle-icon">&#128065;</span>
+                            </button>
+                        </div>
+                        <span class="input-hint" id="matchHint"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" name="terms" id="terms" required>
+                            <span class="checkmark"></span>
+                            I agree to the <a href="#" class="link">Terms of Service</a> and <a href="#" class="link">Privacy Policy</a>
+                        </label>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-block">
+                        Create Account
+                    </button>
+                </form>
+
+                <div class="auth-divider">
+                    <span>Already have an account?</span>
+                </div>
+
+                <a href="{{ url_for('login') }}" class="btn btn-outline btn-block">
+                    Sign In Instead
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function togglePassword(inputId) {
+    const input = document.getElementById(inputId);
+    const icon = document.getElementById(inputId + '-toggle-icon');
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.innerHTML = '&#128064;';
+    } else {
+        input.type = 'password';
+        icon.innerHTML = '&#128065;';
+    }
+}
+
+function checkPasswordStrength() {
+    const password = document.getElementById('password').value;
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    
+    let strength = 0;
+    let requirements = {
+        length: password.length >= 8,
+        upper: /[A-Z]/.test(password),
+        lower: /[a-z]/.test(password),
+        number: /[0-9]/.test(password),
+        special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+    };
+
+    // Update requirement indicators
+    document.getElementById('req-length').className = 'req-item ' + (requirements.length ? 'met' : '');
+    document.getElementById('req-upper').className = 'req-item ' + (requirements.upper ? 'met' : '');
+    document.getElementById('req-lower').className = 'req-item ' + (requirements.lower ? 'met' : '');
+    document.getElementById('req-number').className = 'req-item ' + (requirements.number ? 'met' : '');
+    document.getElementById('req-special').className = 'req-item ' + (requirements.special ? 'met' : '');
+
+    // Calculate strength
+    for (let key in requirements) {
+        if (requirements[key]) strength++;
+    }
+
+    // Update strength bar
+    const percentage = (strength / 5) * 100;
+    strengthFill.style.width = percentage + '%';
+    
+    if (strength === 0) {
+        strengthFill.className = 'strength-fill';
+        strengthText.textContent = 'Enter a password';
+    } else if (strength <= 2) {
+        strengthFill.className = 'strength-fill weak';
+        strengthText.textContent = 'Weak password';
+    } else if (strength <= 4) {
+        strengthFill.className = 'strength-fill medium';
+        strengthText.textContent = 'Medium strength';
+    } else {
+        strengthFill.className = 'strength-fill strong';
+        strengthText.textContent = 'Strong password';
+    }
+}
+
+function checkPasswordMatch() {
+    const password = document.getElementById('password').value;
+    const confirm = document.getElementById('confirm_password').value;
+    const hint = document.getElementById('matchHint');
+    
+    if (confirm === '') {
+        hint.textContent = '';
+        hint.className = 'input-hint';
+    } else if (password === confirm) {
+        hint.textContent = 'Passwords match';
+        hint.className = 'input-hint success';
+    } else {
+        hint.textContent = 'Passwords do not match';
+        hint.className = 'input-hint error';
+    }
+}
+</script>
+{% endblock %}

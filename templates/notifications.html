@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content notifications-page">
+        <div class="page-header">
+            <h1>Notifications</h1>
+            <button class="btn btn-outline btn-sm">Mark All as Read</button>
+        </div>
+
+        <!-- Notification Filters -->
+        <div class="notification-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="unread">Unread</button>
+            <button class="filter-btn" data-filter="mentions">Mentions</button>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="notifications-list">
+            {% if notifications %}
+            <div class="notification-section">
+                {% for notification in notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}"
+                    id="notification-{{ notification.id }}">
+                    <div class="notification-icon {{ notification.notification_type }}">
+                        {% if notification.notification_type == 'friend_request' %}
+                        <span>&#128101;</span>
+                        {% elif notification.notification_type == 'friend_accept' %}
+                        <span>&#10003;</span>
+                        {% elif notification.notification_type == 'like' %}
+                        <span>&#9829;</span>
+                        {% elif notification.notification_type == 'comment' %}
+                        <span>&#128172;</span>
+                        {% else %}
+                        <span>&#128276;</span>
+                        {% endif %}
+                    </div>
+                    <div class="notification-content">
+                        {% if notification.related_user %}
+                        <a href="{{ url_for('profile', username=notification.related_user.username) }}"
+                            class="notification-avatar">
+                            {% if notification.related_user.avatar_data %}
+                            <img src="{{ notification.related_user.avatar_data }}"
+                                alt="{{ notification.related_user.username }}">
+                            {% else %}
+                            <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                alt="{{ notification.related_user.username }}">
+                            {% endif %}
+                        </a>
+                        {% endif %}
+                        <div class="notification-text">
+                            <p>
+                                {% if notification.title %}
+                                <strong>{{ notification.title }}:</strong>
+                                {% endif %}
+                                {{ notification.message }}
+                            </p>
+                            <span class="notification-time">{{ get_time_ago(notification.created_at) }}</span>
+                        </div>
+                    </div>
+
+                    {% if notification.notification_type == 'friend_request' %}
+                    <div class="notification-actions">
+                        <button class="btn btn-sm btn-primary"
+                            onclick="acceptFriendRequest('{{ notification.related_user_id }}', '{{ notification.related_friendship_id }}', '{{ notification.id }}')">Accept</button>
+                        <button class="btn btn-sm btn-outline"
+                            onclick="rejectFriendRequest('{{ notification.related_user_id }}', '{{ notification.related_friendship_id }}', '{{ notification.id }}')">Decline</button>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">&#128276;</div>
+                <h3>No notifications yet</h3>
+                <p>When you get mentioned or receive friend requests, they'll show up here.</p>
+            </div>
+            {% endif %}
+        </div>
+
+    </main>
+</div>
+
+<!-- Social JS -->
+<script src="{{ url_for('static', filename='js/social.js') }}"></script>
+
+<script>
+
+    // Filter notifications
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const notificationItems = document.querySelectorAll('.notification-item');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            notificationItems.forEach(item => {
+                if (filter === 'all') {
+                    item.style.display = 'flex';
+                } else if (filter === 'unread') {
+                    item.style.display = item.classList.contains('unread') ? 'flex' : 'none';
+                } else if (filter === 'mentions') {
+                    const icon = item.querySelector('.notification-icon');
+                    item.style.display = icon.classList.contains('mention') ? 'flex' : 'none';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

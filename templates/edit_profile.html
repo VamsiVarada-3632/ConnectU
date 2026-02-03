@@ -1,0 +1,195 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <a href="{{ url_for('feed') }}" class="logo">
+                <span class="logo-icon">C</span>
+                <span class="logo-text">ConnectU</span>
+            </a>
+        </div>
+
+        <nav class="sidebar-nav">
+            <a href="{{ url_for('feed') }}" class="nav-item">
+                <span class="nav-icon">&#127968;</span>
+                <span class="nav-label">Home</span>
+            </a>
+            <a href="{{ url_for('search') }}" class="nav-item">
+                <span class="nav-icon">&#128269;</span>
+                <span class="nav-label">Search</span>
+            </a>
+            <a href="{{ url_for('notifications') }}" class="nav-item">
+                <span class="nav-icon">&#128276;</span>
+                <span class="nav-label">Notifications</span>
+                {% if unread_notifications_count > 0 %}
+                <span class="nav-badge">{{ unread_notifications_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('chat') }}" class="nav-item">
+                <span class="nav-icon">&#128172;</span>
+                <span class="nav-label">Messages</span>
+                {% if unread_messages_count > 0 %}
+                <span class="nav-badge">{{ unread_messages_count }}</span>
+                {% endif %}
+            </a>
+            <a href="{{ url_for('friends') }}" class="nav-item">
+                <span class="nav-icon">&#128101;</span>
+                <span class="nav-label">Friends</span>
+            </a>
+            <a href="{{ url_for('create_post') }}" class="nav-item">
+                <span class="nav-icon">&#10010;</span>
+                <span class="nav-label">Create Post</span>
+            </a>
+            <a href="{{ url_for('profile') }}" class="nav-item active">
+                <span class="nav-icon">&#128100;</span>
+                <span class="nav-label">Profile</span>
+            </a>
+            <a href="{{ url_for('settings') }}" class="nav-item">
+                <span class="nav-icon">&#9881;</span>
+                <span class="nav-label">Settings</span>
+            </a>
+        </nav>
+
+        <div class="sidebar-footer">
+            <a href="{{ url_for('logout') }}" class="nav-item logout">
+                <span class="nav-icon">&#128682;</span>
+                <span class="nav-label">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content edit-profile-page">
+        <div class="page-header">
+            <a href="{{ url_for('profile') }}" class="back-btn">
+                <span>&#8592;</span> Back to Profile
+            </a>
+            <h1>Edit Profile</h1>
+        </div>
+
+        <form action="{{ url_for('edit_profile') }}" method="POST" enctype="multipart/form-data"
+            class="edit-profile-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Cover Photo -->
+            <div class="cover-photo-section">
+                <div class="cover-preview">
+                    <img src="{{ url_for('static', filename='images/default-cover.png') }}" alt="Cover photo"
+                        id="coverPreview">
+                    <div class="cover-overlay">
+                        <label for="coverPhoto" class="upload-btn">
+                            <span>&#128247;</span> Change Cover Photo
+                        </label>
+                        <input type="file" id="coverPhoto" name="cover_photo" accept="image/*" hidden>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Photo -->
+            <div class="profile-photo-section">
+                <div class="avatar-preview">
+                    {% if current_user.avatar_data %}
+                    <img src="{{ current_user.avatar_data }}" alt="{{ current_user.username }}" id="avatarPreview">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                        alt="{{ current_user.username }}" id="avatarPreview">
+                    {% endif %}
+                    <label for="avatarPhoto" class="upload-avatar-btn">
+                        <span>&#128247;</span>
+                    </label>
+                    <input type="file" id="avatarPhoto" name="avatar_photo" accept="image/*" hidden>
+                </div>
+                <p class="upload-hint">JPG, PNG or GIF. Max size 5MB.</p>
+            </div>
+
+            <!-- Basic Info -->
+            <div class="form-section">
+                <h3>Basic Information</h3>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="firstName">First Name</label>
+                        <input type="text" id="firstName" name="first_name" value="{{ current_user.first_name }}"
+                            required>
+                    </div>
+                    <div class="form-group">
+                        <label for="lastName">Last Name</label>
+                        <input type="text" id="lastName" name="last_name" value="{{ current_user.last_name }}" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <div class="input-with-prefix">
+                        <span class="prefix">@</span>
+                        <input type="text" id="username" name="username" value="{{ current_user.username }}" required>
+                    </div>
+                    <span class="input-hint">Only lowercase letters, numbers, and underscores</span>
+                </div>
+
+                <div class="form-group">
+                    <label for="bio">Bio</label>
+                    <textarea id="bio" name="bio" rows="3" maxlength="150"
+                        placeholder="Write a short bio about yourself...">{{ current_user.bio or '' }}</textarea>
+                    <span class="char-count"><span id="bioCount">{{ current_user.bio|length if current_user.bio else 0
+                            }}</span>/150</span>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="form-section">
+                <h3>Contact Information</h3>
+
+                <div class="form-group">
+                    <label for="email">Email Address</label>
+                    <input type="email" id="email" name="email" value="{{ current_user.email }}" required>
+                    <span class="input-hint">Email changes require OTP verification</span>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="form-actions">
+                <a href="{{ url_for('profile') }}" class="btn btn-outline">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </main>
+</div>
+
+<script>
+    // Image preview functionality
+    document.getElementById('coverPhoto').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('coverPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('avatarPhoto').addEventListener('change', function (e) {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('avatarPreview').src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    // Bio character count
+    const bioTextarea = document.getElementById('bio');
+    const bioCount = document.getElementById('bioCount');
+
+    bioTextarea.addEventListener('input', function () {
+        bioCount.textContent = this.value.length;
+    });
+</script>
+{% endblock %}

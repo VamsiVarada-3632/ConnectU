@@ -1,0 +1,69 @@
+<aside class="sidebar">
+    <div class="sidebar-header">
+        <a href="{{ url_for('feed') }}" class="logo">
+            <span class="logo-icon">C</span>
+            <span class="logo-text">ConnectU</span>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <a href="{{ url_for('feed') }}" class="nav-item {% if request.endpoint == 'feed' %}active{% endif %}">
+            <span class="nav-icon">&#127968;</span>
+            <span class="nav-label">Home</span>
+        </a>
+        <a href="{{ url_for('search') }}" class="nav-item {% if request.endpoint == 'search' %}active{% endif %}">
+            <span class="nav-icon">&#128269;</span>
+            <span class="nav-label">Search</span>
+        </a>
+        <a href="{{ url_for('notifications') }}"
+            class="nav-item {% if request.endpoint == 'notifications' %}active{% endif %}">
+            <span class="nav-icon">&#128276;</span>
+            <span class="nav-label">Notifications</span>
+            <span class="nav-badge" id="badge-notifications" {% if unread_notifications_count==0
+                %}style="display: none;" {% endif %}>{{ unread_notifications_count }}</span>
+        </a>
+        {% if current_user.role != 'guest' %}
+        <a href="{{ url_for('chat') }}" class="nav-item {% if request.endpoint == 'chat' %}active{% endif %}">
+            <span class="nav-icon">&#128172;</span>
+            <span class="nav-label">Messages</span>
+            <span class="nav-badge" id="badge-messages" {% if unread_messages_count==0 %}style="display: none;" {% endif
+                %}>{{ unread_messages_count }}</span>
+        </a>
+        {% endif %}
+        <a href="{{ url_for('friends') }}" class="nav-item {% if request.endpoint == 'friends' %}active{% endif %}">
+            <span class="nav-icon">&#128101;</span>
+            <span class="nav-label">Friends</span>
+            <span class="nav-badge" id="badge-friend-requests" {% if pending_friend_requests_count==0
+                %}style="display: none;" {% endif %}>{{ pending_friend_requests_count }}</span>
+        </a>
+        {% if current_user.role != 'guest' %}
+        <a href="{{ url_for('create_post') }}"
+            class="nav-item {% if request.endpoint == 'create_post' %}active{% endif %}">
+            <span class="nav-icon">&#10010;</span>
+            <span class="nav-label">Create Post</span>
+        </a>
+        {% endif %}
+        <a href="{{ url_for('profile') }}" class="nav-item {% if request.endpoint == 'profile' %}active{% endif %}">
+            <span class="nav-icon">&#128100;</span>
+            <span class="nav-label">Profile</span>
+        </a>
+        <a href="{{ url_for('settings') }}" class="nav-item {% if request.endpoint == 'settings' %}active{% endif %}">
+            <span class="nav-icon">&#9881;</span>
+            <span class="nav-label">Settings</span>
+        </a>
+        {% if current_user.is_authenticated and current_user.role == 'admin' %}
+        <a href="{{ url_for('admin_dashboard') }}"
+            class="nav-item {% if request.endpoint == 'admin_dashboard' %}active{% endif %}">
+            <span class="nav-icon">&#128737;</span>
+            <span class="nav-label">Admin Dashboard</span>
+        </a>
+        {% endif %}
+    </nav>
+
+    <div class="sidebar-footer">
+        <a href="{{ url_for('logout') }}" class="nav-item logout">
+            <span class="nav-icon">&#128682;</span>
+            <span class="nav-label">Logout</span>
+        </a>
+    </div>
+</aside>

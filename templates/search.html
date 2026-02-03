@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}Search - ConnectU{% endblock %}
+
+{% block content %}
+<div class="app-layout">
+    <!-- Sidebar Navigation -->
+    {% include 'sidebar_nav.html' %}
+
+
+    <!-- Main Content -->
+    <main class="main-content search-page">
+        <div class="search-header">
+            <form class="search-form" action="{{ url_for('search') }}" method="GET">
+                <div class="search-input-wrapper">
+                    <span class="search-icon">&#128269;</span>
+                    <input type="text" name="q" placeholder="Search for people, posts, or tags..."
+                        class="search-input-lg" autofocus>
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Search Filters -->
+        <div class="search-filters">
+            <button class="filter-btn active" data-filter="all">All</button>
+            <button class="filter-btn" data-filter="people">People</button>
+            <button class="filter-btn" data-filter="posts">Posts</button>
+            <button class="filter-btn" data-filter="tags">Tags</button>
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results">
+            {% if query %}
+            {% if results %}
+            <!-- People Results -->
+            <div class="results-section" id="peopleResults">
+                <h3>People</h3>
+                <div class="people-results">
+                    {% for user in results %}
+                    <div class="search-user-card" id="search-user-{{ user.id }}">
+                        <a href="{{ url_for('profile', username=user.username) }}" class="user-info">
+                            <div class="user-avatar">
+                                {% if user.avatar_data %}
+                                <img src="{{ user.avatar_data }}" alt="{{ user.username }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/default-avatar.png') }}"
+                                    alt="{{ user.username }}">
+                                {% endif %}
+                            </div>
+                            <div class="user-details">
+                                <span class="user-name">{{ user.first_name }} {{ user.last_name }}</span>
+                                <span class="user-username">@{{ user.username }}</span>
+                                <span class="user-bio">{{ user.bio or 'ConnectU Student' }}</span>
+                            </div>
+                        </a>
+
+                        {% if user.friend_status == 'friends' %}
+                        <button class="btn btn-outline btn-sm" disabled>Friends</button>
+                        {% elif user.friend_status == 'request_sent' %}
+                        <button class="btn btn-outline btn-sm" disabled>Request Sent</button>
+                        {% elif user.friend_status == 'request_received' %}
+                        <a href="{{ url_for('friends') }}" class="btn btn-primary btn-sm">Respond</a>
+                        {% else %}
+                        <button class="btn btn-primary btn-sm" onclick="sendFriendRequest('{{ user.id }}')">Add
+                            Friend</button>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <div class="empty-icon">&#128269;</div>
+                <h3>No results found for "{{ query }}"</h3>
+                <p>Try different keywords or check your spelling.</p>
+            </div>
+            {% endif %}
+            {% else %}
+            <!-- Recent Searches (shown when no query) -->
+            <div class="recent-searches" id="recentSearches">
+                <h3>Recent Searches</h3>
+                <div class="recent-list">
+                    <div class="empty-state" style="padding: 20px;">
+                        <p>Enter a name, username, or email to find people.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </main>
+</div>
+
+<!-- Social JS -->
+<script src="{{ url_for('static', filename='js/social.js') }}"></script>
+
+
+<script>
+    // Filter functionality
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const resultsSections = document.querySelectorAll('.results-section');
+
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const filter = btn.dataset.filter;
+
+            // Update active button
+            filterBtns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            // Show/hide sections based on filter
+            if (filter === 'all') {
+                resultsSections.forEach(s => s.style.display = 'block');
+            } else {
+                resultsSections.forEach(s => {
+                    if (s.id === filter + 'Results') {
+                        s.style.display = 'block';
+                    } else {
+                        s.style.display = 'none';
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}
