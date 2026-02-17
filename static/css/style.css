@@ -23,18 +23,34 @@
 
 [data-theme="dark"] {
     /* Color Palette - Dark Mode */
-    --primary: #3b82f6;
+    --primary: #60a5fa;
     /* Lighter blue for dark mode */
-    --primary-hover: #60a5fa;
+    --primary-hover: #3b82f6;
     --secondary: #f9fafb;
     --accent: #34d399;
-    --bg-primary: #111827;
-    --bg-card: #1f2937;
-    --text-primary: #f9fafb;
-    --text-secondary: #9ca3af;
-    --border-color: #374151;
-    --border-hover: #6b7280;
-    --input-bg: #374151;
+
+    /* Much darker backgrounds to match reference */
+    --bg-primary: #0f172a;
+    /* Very dark navy/black */
+    --bg-card: #1e293b;
+    /* Dark slate for cards */
+
+    /* Text colors */
+    --text-primary: #f1f5f9;
+    /* Light gray for primary text */
+    --text-secondary: #94a3b8;
+    /* Muted gray for secondary text */
+
+    /* Borders */
+    --border-color: #334155;
+    /* Subtle dark border */
+    --border-hover: #475569;
+
+    /* Inputs */
+    --input-bg: #1e293b;
+    /* Dark input background */
+
+    /* Danger/Error colors */
     --danger: #ef4444;
     --danger-hover: #f87171;
     --danger-bg: #450a0a;
@@ -600,7 +616,7 @@ h4 {
 }
 
 .step.active .step-number {
-    background: #ffffff;
+    background: var(--bg-card);
     color: var(--primary);
 }
 
@@ -650,7 +666,7 @@ h4 {
 .form-group label {
     font-size: 0.875rem;
     font-weight: 500;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .form-group input,
@@ -920,7 +936,7 @@ h4 {
 /* Sidebar */
 .sidebar {
     width: 240px;
-    background: #ffffff;
+    background: var(--bg-card);
     border-right: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
@@ -947,7 +963,7 @@ h4 {
     align-items: center;
     gap: 0.75rem;
     padding: 0.75rem 1.25rem;
-    color: #374151;
+    color: var(--text-primary);
     font-size: 0.9375rem;
     transition: all 0.2s ease;
     position: relative;
@@ -1001,7 +1017,7 @@ h4 {
     flex: 1;
     margin-left: 240px;
     padding: 2rem;
-    background: #f9fafb;
+    background: var(--bg-primary);
 }
 
 /* Feed Container */
@@ -1012,7 +1028,7 @@ h4 {
 
 /* Create Post Card */
 .create-post-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -1076,7 +1092,7 @@ h4 {
 
 /* Post Card */
 .post-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     margin-bottom: 1.5rem;
@@ -1207,7 +1223,7 @@ h4 {
 .post-comments {
     padding: 1rem;
     border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
+    background: var(--bg-primary);
 }
 
 .comment {
@@ -1231,7 +1247,7 @@ h4 {
 }
 
 .comment-content {
-    background: #ffffff;
+    background: var(--bg-card);
     padding: 0.625rem 0.875rem;
     border-radius: 0.75rem;
     flex: 1;
@@ -1244,7 +1260,7 @@ h4 {
 
 .comment-content p {
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .add-comment {
@@ -1283,11 +1299,11 @@ h4 {
     bottom: 0;
     padding: 2rem 1.5rem;
     overflow-y: auto;
-    background: #f9fafb;
+    background: var(--bg-primary);
 }
 
 .sidebar-section {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -1425,7 +1441,7 @@ h4 {
 }
 
 .profile-header {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     overflow: hidden;
@@ -1505,7 +1521,7 @@ h4 {
 }
 
 .profile-bio {
-    color: #374151;
+    color: var(--text-primary);
     margin-bottom: 0.75rem;
 }
 
@@ -1536,7 +1552,7 @@ h4 {
 .profile-stats {
     display: flex;
     gap: 1rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -1568,7 +1584,7 @@ h4 {
 /* Profile Tabs */
 .profile-tabs {
     display: flex;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 0.5rem;
@@ -1634,7 +1650,7 @@ h4 {
 }
 
 .friend-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1.5rem 1rem;
@@ -1673,7 +1689,7 @@ h4 {
 
 /* About Section */
 .about-section {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1.5rem;
@@ -1739,7 +1755,7 @@ h4 {
     align-items: center;
     gap: 0.5rem;
     padding: 0.5rem 1rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #d1d5db;
     border-radius: 999px;
     width: 300px;
@@ -1760,7 +1776,7 @@ h4 {
 .friends-tabs {
     display: flex;
     gap: 0.5rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 0.5rem;
@@ -1800,7 +1816,7 @@ h4 {
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -1885,7 +1901,7 @@ h4 {
     display: flex;
     align-items: center;
     gap: 0.75rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #d1d5db;
     border-radius: 0.75rem;
     padding: 0.75rem 1rem;
@@ -1908,7 +1924,7 @@ h4 {
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
     color: #6b7280;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #d1d5db;
     border-radius: 999px;
 }
@@ -1934,7 +1950,7 @@ h4 {
 }
 
 .recent-searches {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -1981,7 +1997,7 @@ h4 {
     display: flex;
     align-items: center;
     gap: 1rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -2006,7 +2022,7 @@ h4 {
 
 /* Search Post Card */
 .search-post-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem;
@@ -2023,7 +2039,7 @@ h4 {
 .tag-card {
     display: flex;
     flex-direction: column;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1rem 1.5rem;
@@ -2063,7 +2079,7 @@ h4 {
 }
 
 .edit-profile-form {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     overflow: hidden;
@@ -2240,7 +2256,7 @@ h4 {
     left: 3px;
     width: 20px;
     height: 20px;
-    background: #ffffff;
+    background: var(--bg-card);
     border-radius: 50%;
     transition: all 0.2s ease;
 }
@@ -2263,7 +2279,7 @@ h4 {
     gap: 1rem;
     padding: 1.5rem 2rem;
     border-top: 1px solid #e5e7eb;
-    background: #f9fafb;
+    background: var(--bg-primary);
 }
 
 /* ============================================
@@ -2274,7 +2290,7 @@ h4 {
 }
 
 .create-post-form {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     overflow: hidden;
@@ -2355,7 +2371,7 @@ h4 {
     border: 1px solid #e5e7eb;
     border-radius: 0.5rem;
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-primary);
     cursor: pointer;
 }
 
@@ -2418,7 +2434,7 @@ h4 {
 
 .conversations-panel {
     width: 320px;
-    background: #ffffff;
+    background: var(--bg-card);
     border-right: 1px solid #e5e7eb;
     display: flex;
     flex-direction: column;
@@ -2445,7 +2461,7 @@ h4 {
     background: #f3f4f6;
     border-radius: 50%;
     font-size: 1.25rem;
-    color: #374151;
+    color: var(--text-primary);
 }
 
 .new-chat-btn:hover {
@@ -2561,7 +2577,7 @@ h4 {
     flex: 1;
     display: flex;
     flex-direction: column;
-    background: #f9fafb;
+    background: var(--bg-primary);
 }
 
 .chat-header {
@@ -2569,7 +2585,7 @@ h4 {
     align-items: center;
     justify-content: space-between;
     padding: 1rem 1.5rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border-bottom: 1px solid #e5e7eb;
 }
 
@@ -2671,7 +2687,7 @@ h4 {
 }
 
 .date-separator span {
-    background: #f9fafb;
+    background: var(--bg-primary);
     padding: 0 1rem;
     font-size: 0.75rem;
     color: #6b7280;
@@ -2709,7 +2725,7 @@ h4 {
 }
 
 .message.received .message-content {
-    background: #ffffff;
+    background: var(--bg-card);
     border-bottom-left-radius: 0.25rem;
 }
 
@@ -2789,7 +2805,7 @@ h4 {
     align-items: center;
     gap: 0.75rem;
     padding: 1rem 1.5rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border-top: 1px solid #e5e7eb;
 }
 
@@ -2852,7 +2868,7 @@ h4 {
 
 .settings-nav {
     width: 220px;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 0.5rem;
@@ -2868,7 +2884,7 @@ h4 {
     width: 100%;
     padding: 0.75rem 1rem;
     font-size: 0.9375rem;
-    color: #374151;
+    color: var(--text-primary);
     border-radius: 0.5rem;
     text-align: left;
 }
@@ -2903,7 +2919,7 @@ h4 {
 }
 
 .settings-card {
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     padding: 1.5rem;
@@ -3053,7 +3069,7 @@ h4 {
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem;
-    background: #f9fafb;
+    background: var(--bg-primary);
     border-radius: 0.5rem;
     font-size: 0.8125rem;
     color: #6b7280;
@@ -3132,7 +3148,7 @@ h4 {
     align-items: center;
     gap: 1rem;
     padding: 0.75rem;
-    background: #f9fafb;
+    background: var(--bg-primary);
     border-radius: 0.5rem;
 }
 
@@ -3196,7 +3212,7 @@ h4 {
     align-items: flex-start;
     gap: 0.75rem;
     padding: 1rem;
-    background: #ffffff;
+    background: var(--bg-card);
     border: 1px solid #e5e7eb;
     border-radius: 0.75rem;
     margin-bottom: 0.5rem;
@@ -3500,7 +3516,7 @@ h4 {
     text-align: left;
     padding: 10px 16px;
     font-size: 0.875rem;
-    color: #374151;
+    color: var(--text-primary);
     display: flex;
     align-items: center;
     gap: 8px;
