@@ -14,7 +14,7 @@
                 </a>
                 <h1>Verify Your Identity</h1>
                 <p>Multi-factor authentication keeps your account secure.</p>
-                
+
                 <div class="registration-steps">
                     <div class="step completed">
                         <span class="step-number">&#10003;</span>
@@ -44,16 +44,16 @@
                 <h2>Check Your Email</h2>
                 <p class="form-subtitle">
                     We've sent a 6-digit verification code to<br>
-                    <strong id="maskedEmail">j***@university.edu</strong>
+                    <strong id="maskedEmail">{{ masked_email }}</strong>
                 </p>
 
                 <!-- Flash Messages -->
                 {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="alert alert-{{ category }}">{{ message }}</div>
-                        {% endfor %}
-                    {% endif %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+                {% endif %}
                 {% endwith %}
 
                 <form action="{{ url_for('verify_otp') }}" method="POST" class="auth-form" id="otpForm">
@@ -105,94 +105,94 @@
 </div>
 
 <script>
-// OTP Input Handling
-const otpInputs = document.querySelectorAll('.otp-input');
-const otpValue = document.getElementById('otpValue');
+    // OTP Input Handling
+    const otpInputs = document.querySelectorAll('.otp-input');
+    const otpValue = document.getElementById('otpValue');
 
-otpInputs.forEach((input, index) => {
-    input.addEventListener('input', (e) => {
-        const value = e.target.value;
-        
-        // Allow only numbers
-        if (!/^\d*$/.test(value)) {
-            e.target.value = '';
-            return;
-        }
-        
-        // Move to next input
-        if (value && index < otpInputs.length - 1) {
-            otpInputs[index + 1].focus();
-        }
-        
-        // Update hidden input
-        updateOTPValue();
-    });
-    
-    input.addEventListener('keydown', (e) => {
-        // Handle backspace
-        if (e.key === 'Backspace' && !e.target.value && index > 0) {
-            otpInputs[index - 1].focus();
-        }
-    });
-    
-    input.addEventListener('paste', (e) => {
-        e.preventDefault();
-        const pastedData = e.clipboardData.getData('text').slice(0, 6);
-        if (/^\d+$/.test(pastedData)) {
-            pastedData.split('').forEach((char, i) => {
-                if (otpInputs[i]) {
-                    otpInputs[i].value = char;
-                }
-            });
+    otpInputs.forEach((input, index) => {
+        input.addEventListener('input', (e) => {
+            const value = e.target.value;
+
+            // Allow only numbers
+            if (!/^\d*$/.test(value)) {
+                e.target.value = '';
+                return;
+            }
+
+            // Move to next input
+            if (value && index < otpInputs.length - 1) {
+                otpInputs[index + 1].focus();
+            }
+
+            // Update hidden input
             updateOTPValue();
-            otpInputs[Math.min(pastedData.length, otpInputs.length - 1)].focus();
-        }
+        });
+
+        input.addEventListener('keydown', (e) => {
+            // Handle backspace
+            if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                otpInputs[index - 1].focus();
+            }
+        });
+
+        input.addEventListener('paste', (e) => {
+            e.preventDefault();
+            const pastedData = e.clipboardData.getData('text').slice(0, 6);
+            if (/^\d+$/.test(pastedData)) {
+                pastedData.split('').forEach((char, i) => {
+                    if (otpInputs[i]) {
+                        otpInputs[i].value = char;
+                    }
+                });
+                updateOTPValue();
+                otpInputs[Math.min(pastedData.length, otpInputs.length - 1)].focus();
+            }
+        });
     });
-});
 
-function updateOTPValue() {
-    let otp = '';
-    otpInputs.forEach(input => {
-        otp += input.value;
-    });
-    otpValue.value = otp;
-}
-
-// Countdown Timer
-let timeLeft = 300; // 5 minutes in seconds
-const countdownEl = document.getElementById('countdown');
-const timerText = document.getElementById('timerText');
-const resendBtn = document.getElementById('resendBtn');
-
-function updateTimer() {
-    const minutes = Math.floor(timeLeft / 60);
-    const seconds = timeLeft % 60;
-    countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-    
-    if (timeLeft === 0) {
-        timerText.innerHTML = '<span class="expired">Code has expired</span>';
-        resendBtn.disabled = false;
-        resendBtn.classList.add('active');
-    } else {
-        timeLeft--;
-        setTimeout(updateTimer, 1000);
+    function updateOTPValue() {
+        let otp = '';
+        otpInputs.forEach(input => {
+            otp += input.value;
+        });
+        otpValue.value = otp;
     }
-}
 
-updateTimer();
+    // Countdown Timer
+    let timeLeft = 300; // 5 minutes in seconds
+    const countdownEl = document.getElementById('countdown');
+    const timerText = document.getElementById('timerText');
+    const resendBtn = document.getElementById('resendBtn');
 
-function resendOTP() {
-    // Backend will handle actual resend
-    alert('A new OTP has been sent to your email.');
-    timeLeft = 300;
-    resendBtn.disabled = true;
-    resendBtn.classList.remove('active');
-    timerText.innerHTML = 'Code expires in <strong id="countdown">05:00</strong>';
+    function updateTimer() {
+        const minutes = Math.floor(timeLeft / 60);
+        const seconds = timeLeft % 60;
+        countdownEl.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+        if (timeLeft === 0) {
+            timerText.innerHTML = '<span class="expired">Code has expired</span>';
+            resendBtn.disabled = false;
+            resendBtn.classList.add('active');
+        } else {
+            timeLeft--;
+            setTimeout(updateTimer, 1000);
+        }
+    }
+
     updateTimer();
-    
-    // Clear inputs
-    otpInputs.forEach(input => input.value = '');
-    otpInputs[0].focus();
-}
+
+    function resendOTP() {
+        // Backend will handle actual resend
+        alert('A new OTP has been sent to your email.');
+        timeLeft = 300;
+        resendBtn.disabled = true;
+        resendBtn.classList.remove('active');
+        timerText.innerHTML = 'Code expires in <strong id="countdown">05:00</strong>';
+        updateTimer();
+
+        // Clear inputs
+        otpInputs.forEach(input => input.value = '');
+        otpInputs[0].focus();
+    }
 </script>
 {% endblock %}
