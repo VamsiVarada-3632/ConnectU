@@ -24,7 +24,6 @@ Open your terminal in the project folder and run:
 ```bash
 pip3 install -r requirements.txt
 ```
-
 ### Step 2: Set Environment Variables
 Create a `.env` file (or use the example provided).
 ```bash
