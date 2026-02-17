@@ -1292,21 +1292,23 @@ h4 {
 
 /* Right Sidebar */
 .right-sidebar {
-    width: 300px;
+    width: 320px;
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
-    padding: 2rem 1.5rem;
-    overflow-y: auto;
     background: var(--bg-primary);
+    display: flex !important;
+    flex-direction: column-reverse !important;
+    padding: 2rem 1.75rem;
+    z-index: 900;
 }
 
 .sidebar-section {
     background: var(--bg-card);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--border-color);
     border-radius: 0.75rem;
-    padding: 1rem;
+    padding: 1.25rem;
     margin-bottom: 1rem;
 }
 
@@ -1419,17 +1421,22 @@ h4 {
     background: #f3f4f6;
 }
 
+.sidebar-bottom-content {
+    width: 100%;
+}
+
 .sidebar-footer-info {
     text-align: center;
-    padding: 1rem;
+    padding: 1rem 0;
 }
 
 .security-badge {
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.75rem;
-    color: #6b7280;
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
 }
 
 /* ============================================

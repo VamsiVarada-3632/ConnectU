@@ -146,46 +146,31 @@
 
     <!-- Right Sidebar -->
     <aside class="right-sidebar">
-        <!-- We can dynamically populate this with suggestions if we pass them to the template -->
-        <!-- For now, let's just make it look good but empty or generic links -->
-        <div class="sidebar-section">
-            <h3 class="section-title">Security Status</h3>
-            <div class="security-info-card">
-                <div class="security-item">
-                    <span class="security-icon">&#128274;</span>
-                    <span class="security-label">Account Secure</span>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">&#128273;</span>
-                    <span class="security-label">RSA Keys Active</span>
-                </div>
-                <div class="security-item">
-                    <span class="security-icon">&#128222;</span>
-                    <span class="security-label">2FA Enabled</span>
+        <div class="sidebar-bottom-content">
+            <div class="sidebar-section">
+                <h3 class="section-title">Security Status</h3>
+                <div class="security-info-card">
+                    <div class="security-item">
+                        <span class="security-icon">&#128274;</span>
+                        <span class="security-label">Account Secure</span>
+                    </div>
+                    <div class="security-item">
+                        <span class="security-icon">&#128273;</span>
+                        <span class="security-label">RSA Keys Active</span>
+                    </div>
+                    <div class="security-item">
+                        <span class="security-icon">&#128222;</span>
+                        <span class="security-label">2FA Enabled</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <div class="sidebar-section">
-            <h3 class="section-title">Quick Links</h3>
-            <div class="quick-links">
-                <a href="{{ url_for('friends') }}" class="quick-link">
-                    <span>&#128101;</span> Manage Friends
-                </a>
-                <a href="{{ url_for('settings') }}" class="quick-link">
-                    <span>&#128274;</span> Security Settings
-                </a>
-                <a href="{{ url_for('profile') }}" class="quick-link">
-                    <span>&#128100;</span> Update Profile
-                </a>
+            <div class="sidebar-footer-info">
+                <p class="security-badge">
+                    <span>&#128274;</span> End-to-end encrypted
+                </p>
+                <p class="copyright">&copy; 2024 ConnectU</p>
             </div>
-        </div>
-
-        <div class="sidebar-footer-info">
-            <p class="security-badge">
-                <span>&#128274;</span> End-to-end encrypted
-            </p>
-            <p class="copyright">&copy; 2024 ConnectU</p>
         </div>
     </aside>
 </div>
